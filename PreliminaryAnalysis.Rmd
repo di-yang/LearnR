@@ -1,0 +1,123 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(readxl)
+filenames <- list.files("./Ranked Measure Data")
+filenames
+RMD <- data.frame(matrix(ncol = 0, nrow = 0))
+for (filename in filenames){  
+   yearnum <- gsub(".xls", "", filename)  
+   RMD = RMD %>% bind_rows(assign(paste0("RMD",yearnum), read_excel(paste0("./Ranked Measure Data/", filename), sheet="Ranked Measure Data", skip = 1)%>%
+            mutate(year=yearnum) %>% 
+            select(FIPS, YPLLRate, FairPoor, PhysicallyUnhealthyDays, MentallyUnhealthyDays, year)))
+}
+
+```
+
+```{r}
+library(viridis)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(rjson)
+url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
+counties = rjson::fromJSON(file=url)
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+RMD$year=as.integer(RMD$year)
+RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
+```
+
+```{r}
+#measures = c(YPLLRate, FairPoor, PhysicallyUnhealthyDays, MentallyUnhealthyDays)
+max(RMD$YPLLRate, na.rm = TRUE)
+min(RMD$YPLLRate, na.rm = TRUE)
+plotmap1 = plot_ly(geojson=counties, locations=RMD$FIPS, z=RMD$YPLLRate, colorscale="Viridis", zmin=0, zmax=36469.01, frame=RMD$year, type='choropleth')
+plotmap2=plotmap1 %>%
+  layout(title='Years of Potential Life Lost Rate',
+         geo = g) %>% 
+  animation_opts(
+    frame = 100, 
+    transition = 0, 
+    redraw = TRUE) %>%
+  animation_slider(
+    currentvalue=list(prefix="year")) %>%
+  animation_button(
+    x = 1, xanchor = "right", y = 0, yanchor = "bottom")
+library(htmlwidgets)
+saveWidget(plotmap2, "YPLLRate.html", selfcontained = F, libdir = "lib")
+```
+
+```{r}
+max(RMD$FairPoor, na.rm = TRUE)
+min(RMD$FairPoor, na.rm = TRUE)
+plotmap1 = plot_ly(geojson=counties, locations=RMD$FIPS, z=RMD$FairPoor, colorscale="Viridis", zmin=2, zmax=50.8, frame=RMD$year, type='choropleth')
+plotmap2=plotmap1 %>%
+  layout(title='Percentage of adults that report fair or poor health',
+         geo = g) %>% 
+  animation_opts(
+    frame = 100, 
+    transition = 0, 
+    redraw = TRUE) %>%
+  animation_slider(
+    currentvalue=list(prefix="year")) %>%
+  animation_button(
+    x = 1, xanchor = "right", y = 0, yanchor = "bottom")
+library(htmlwidgets)
+saveWidget(plotmap2, "FairPoor.html", selfcontained = F, libdir = "lib")
+```
+```{r}
+max(RMD$PhysicallyUnhealthyDays, na.rm = TRUE)
+min(RMD$PhysicallyUnhealthyDays, na.rm = TRUE)
+plotmap1 = plot_ly(geojson=counties, locations=RMD$FIPS, z=RMD$PhysicallyUnhealthyDays, colorscale="Viridis", zmin=0.6, zmax=11.2, frame=RMD$year, type='choropleth')
+plotmap2=plotmap1 %>%
+  layout(title='Average number of reported physically unhealthy days per month',
+         geo = g) %>% 
+  animation_opts(
+    frame = 100, 
+    transition = 0, 
+    redraw = TRUE) %>%
+  animation_slider(
+    currentvalue=list(prefix="year")) %>%
+  animation_button(
+    x = 1, xanchor = "right", y = 0, yanchor = "bottom")
+library(htmlwidgets)
+saveWidget(plotmap2, "PhysicallyUnhealthyDays.html", selfcontained = F, libdir = "lib")
+```
+```{r}
+max(RMD$MentallyUnhealthyDays, na.rm = TRUE)
+min(RMD$MentallyUnhealthyDays, na.rm = TRUE)
+plotmap1 = plot_ly(geojson=counties, locations=RMD$FIPS, z=RMD$MentallyUnhealthyDays, colorscale="Viridis", zmin=0.4, zmax=10.1, frame=RMD$year, type='choropleth')
+plotmap2=plotmap1 %>%
+  layout(title='Average number of reported mentally unhealthy days per month',
+         geo = g) %>% 
+  animation_opts(
+    frame = 100, 
+    transition = 0, 
+    redraw = TRUE) %>%
+  animation_slider(
+    currentvalue=list(prefix="year")) %>%
+  animation_button(
+    x = 1, xanchor = "right", y = 0, yanchor = "bottom")
+library(htmlwidgets)
+saveWidget(plotmap2, "MentallyUnhealthyDays.html", selfcontained = F, libdir = "lib")
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

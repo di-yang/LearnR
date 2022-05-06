@@ -11,10 +11,10 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 ```{r}
 library(tidyverse)
-CHR2020=read_csv("/Users/yangdi/Desktop/LearnR/2020CHR.csv")
+CHR2020=read_csv("./2020CHR.csv")
 # it's already tidy!
-view(CHR2020)
-CHR2021=read_csv("/Users/yangdi/Desktop/LearnR/2021CHR.csv")
+# view(CHR2020)
+CHR2021=read_csv("./2021CHR.csv")
 CHR2020$FIPS=as.character(CHR2020$FIPS)
 CHR=bind_rows(CHR2020, CHR2021)
 
@@ -24,7 +24,7 @@ CHR=bind_rows(CHR2020, CHR2021)
 library(tidyverse)
 library(naniar)
 rm(list=ls())
-longdata = read_csv("/Users/yangdi/Desktop/LearnR/chr_trends_csv_2021.csv")
+longdata = read_csv("./chr_trends_csv_2021.csv")
 #view(longdata)
 unique(longdata$yearspan)
 yearindex=unique(longdata$yearspan)
@@ -72,8 +72,8 @@ for (i in 1:length(measures)) {
 res_t = tibble(measures, pct_miss_measure, n_complete_measure)  
 ```
 
+
 ```{r}
-library(VIM)
 library(FactoMineR)
 library(missMDA)
 library(naniar)
@@ -86,7 +86,7 @@ n_complete(widedata)
 
 ```{r}
 #summarise(longdata, yearspan)
-longdata = read_csv("/Users/yangdi/Desktop/LearnR/chr_trends_csv_2021.csv")
+longdata = read_csv("./chr_trends_csv_2021.csv")
 longdata=separate(longdata, yearspan, into=c("startyear", "endyear"), sep="-")
 is.integer(longdata$startyear)
 #how to covert char into integer?
@@ -98,14 +98,13 @@ all(longdata$startyear==longdata$endyear-2,na.rm = TRUE)
 
 
 ```{r}
-library(Hmisc)
-analytic2=read_csv(file = "/Users/yangdi/Desktop/LearnR/analytic_data2021.csv")
+analytic2=read_csv(file = "./analytic_data2021.csv")
 view(analytic2)
-firstrow=read_csv(file = "/Users/yangdi/Desktop/LearnR/analytic_data2021.csv",  n_max = 1)
+firstrow=read_csv(file = "./analytic_data2021.csv",  n_max = 1)
 view(firstrow)
 varlabel=colnames(firstrow)
 #view(varlabel)
-analytic=read_csv(file = "/Users/yangdi/Desktop/LearnR/analytic_data2021.csv", skip = 1)
+analytic=read_csv(file = "./analytic_data2021.csv", skip = 1)
 ```
 ```{r}
 library(viridis)
