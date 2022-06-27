@@ -19,6 +19,7 @@ CHR2020$FIPS=as.character(CHR2020$FIPS)
 CHR=bind_rows(CHR2020, CHR2021)
 
 #how to find unmatched columns? how to ignore them and continue?
+
 ```
 ```{r}
 library(tidyverse)
@@ -94,6 +95,9 @@ longdata$startyear=as.integer(longdata$startyear)
 longdata$endyear=as.integer(longdata$endyear)
 #the results is crazily long. Can I have one answer?
 all(longdata$startyear==longdata$endyear-2,na.rm = TRUE)
+longdata$startyear==longdata$endyear-2
+#sum(longdata$startyear==longdata$endyear-2,na.rm = TRUE)
+#identical(longdata$startyear, longdata$endyear-2)
 ```
 
 
