@@ -1,0 +1,64 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(MASS)
+library(ISLR2)
+head(Boston)
+?Boston
+lm.fit=lm(medv ~lstat, data = Boston)
+lm.fit
+summary(lm.fit)
+names(lm.fit)
+coef(lm.fit)
+confint(lm.fit)
+predict(lm.fit , data.frame(lstat= (c(5,10, 15))), interval = "confidence" )
+```
+```{r}
+plot(Boston$lstat, Boston$medv)
+abline(lm.fit)
+abline(lm.fit, lwd= 3)
+par(mfrow = c(2,2))
+plot(lm.fit)
+plot(predict(lm.fit), residuals (lm.fit))
+```
+```{r}
+lm.fit=lm(medv ~ . , data = Boston)
+library(car)
+vif(lm.fit)
+summary(lm(medv ~ lstat * age , data =Boston))
+lm.fit2 = lm(medv ~ lstat + I(lstat^2), data =Boston)
+summary(lm.fit2)
+lm.fit5 = lm(medv ~ poly(lstat , 5), data =Boston)
+summary(lm.fit5)
+summary(lm(medv ~ log(rm), data =Boston))
+```
+```{r}
+head(Carseats)
+lm.fit = lm(Sales ~ . + Income:Advertising + Price:Age, data = Carseats)
+summary(lm.fit)
+attach(Carseats)
+contrasts (ShelveLoc)
+```
+```{r}
+LoadLibraries = function (){
+library(ISLR2)
+library(MASS)
+print(" The libraries have been loaded." )
+}
+LoadLibraries
+LoadLibraries ()
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

@@ -1,0 +1,153 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(readxl)
+filenames <- list.files("./Ranked Measure Data")
+filenames
+RMD <- data.frame(matrix(ncol = 0, nrow = 0))
+for (filename in filenames){  
+   yearnum <- gsub(".xls", "", filename)  
+   RMD = RMD %>% bind_rows(assign(paste0("RMD",yearnum), read_excel(paste0("./Ranked Measure Data/", filename), sheet="Ranked Measure Data", skip = 1) %>%
+            mutate(year=yearnum) %>% 
+            select(FIPS, YPLLRate, FairPoor, PhysicallyUnhealthyDays, MentallyUnhealthyDays, year, PCPRate, obesity, somecollege, highschool, any_of(c("PM25", "inactivity")))))
+}
+
+```
+cor(na.omit(analytic[,109:120]))
+check obesity 2012 and 2013 are the same
+
+```{r}
+library(viridis)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(rjson)
+url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
+counties = rjson::fromJSON(file=url)
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+RMD$year=as.integer(RMD$year)
+RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
+```
+
+
+```{r}
+RMD=RMD %>% drop_na(FIPS)
+RMDwide= pivot_wider(RMD, id_cols = FIPS,  names_from = year, values_from = c(YPLLRate, FairPoor, PhysicallyUnhealthyDays, MentallyUnhealthyDays, PCPRate, obesity, PM25, inactivity, somecollege, highschool))
+longdata = read_csv("./chr_trends_csv_2021.csv")
+allmeasures=unique(longdata$measurename)
+
+predictornamelist = list("childpoverty",
+            "uninsuredrate",
+            "unemploymentrate"
+            )
+predictornamestrlist = list("Children in poverty",
+            "Uninsured",
+            "Unemployment rate"
+            )
+runlist = list("MentallyUnhealthyDays_2020 - MentallyUnhealthyDays_2017",
+            "PhysicallyUnhealthyDays_2020 - PhysicallyUnhealthyDays_2017",
+            "YPLLRate_2020 - YPLLRate_2017",
+            "FairPoor_2020 - FairPoor_2017"
+            )
+
+call.cleaning = function(predictorname, predictornamestr){
+  predictordata=subset(longdata, measurename==predictornamestr)
+  table(predictordata$yearspan)
+  predictordata=predictordata %>% arrange(statecode, countycode, yearspan)
+  predictordata$FIPS=paste(predictordata$statecode, predictordata$countycode, sep="")
+  tomerge=predictordata %>% filter(predictordata$countycode !="000")
+  tomerge=rename(tomerge, year=yearspan)
+  tomerge=eval(parse(text=paste("rename(tomerge, ", predictorname, "=rawvalue)")))
+  tomerge=eval(parse(text=paste("subset(tomerge, select=c(year, FIPS, ", predictorname, ", cilow))")))
+  name_pre=paste0(predictorname, "_")
+
+  tomerge=eval(parse(text=paste("pivot_wider(tomerge, id_cols = FIPS,  names_from = year , names_prefix=name_pre, values_from = c(", predictorname, "))")))
+  RMDwide=merge(tomerge, RMDwide, by.x="FIPS", by.y="FIPS")
+  return(RMDwide)
+}
+res.cleaning = mapply(call.cleaning, predictornamelist, predictornamestrlist)
+
+call.tomerge = function(predictorname, predictornamestr){
+  predictordata=subset(longdata, measurename==predictornamestr)
+  table(predictordata$yearspan)
+  predictordata=predictordata %>% arrange(statecode, countycode, yearspan)
+  predictordata$FIPS=paste(predictordata$statecode, predictordata$countycode, sep="")
+  tomerge=predictordata %>% filter(predictordata$countycode !="000")
+  tomerge=rename(tomerge, year=yearspan)
+  tomerge=eval(parse(text=paste("rename(tomerge, ", predictorname, "=rawvalue)")))
+  tomerge=eval(parse(text=paste("subset(tomerge, select=c(year, FIPS, ", predictorname, ", cilow))")))
+  name_pre=paste0(predictorname, "_")
+  #print(name_pre)
+  tomerge=eval(parse(text=paste("pivot_wider(tomerge, id_cols = FIPS,  names_from = year , names_prefix=name_pre, values_from = c(", predictorname, "))")))
+  return(tomerge)
+}
+res.tomerge = mapply(call.tomerge, predictornamelist, predictornamestrlist)
+analytic=merge(res.tomerge[[1]], RMDwide, by.x="FIPS", by.y="FIPS")
+analytic=merge(res.tomerge[[2]], analytic, by.x="FIPS", by.y="FIPS")
+analytic=merge(res.tomerge[[3]], analytic, by.x="FIPS", by.y="FIPS")
+analytic <- subset(analytic, select = -c(PM25_2010, PM25_2011, PM25_2012, inactivity_2010))
+
+depvarlist = list("MentallyUnhealthyDays_2020",
+            "PhysicallyUnhealthyDays_2020",
+            "YPLLRate_2020",
+            "FairPoor_2020"
+            )
+
+predvarnames=names(analytic)
+predvarnames
+
+library(naniar)
+missplot=gg_miss_var(analytic)
+view(missplot$data)
+pct_miss(analytic)
+n_complete(analytic)
+
+call.lm = function(depvarname){
+  formula.lm = as.formula(paste(depvarname, paste(paste(predvarnames[2:48], collapse=" + "), paste(predvarnames[97:164], collapse=" + "), sep=" + "), sep=" ~ "))
+  res.lm = lm(formula = formula.lm, data = analytic, na.action=na.exclude)
+  return(res.lm)
+}
+
+res.reg = lapply(depvarlist, call.lm)
+show.res.reg=lapply(res.reg,summary)
+show.res.reg
+ 
+save(analytic, file = "analytic.RData")
+```
+
+```{r}
+analytic2=analytic %>% subset(select=-c(PCPRate_2012, obesity_2013, PM25_2015, PM25_2016, PM25_2018, PM25_2020, inactivity_2013, highschool_2018))
+analytic2 = na.omit(analytic2)
+names(analytic2)
+save(analytic2, file = "analytic2.RData")
+
+```
+
+```{r}
+YPLLanalytic=data.frame(analytic2[2:48], analytic2$YPLLRate_2021, analytic2[97:156])
+names(YPLLanalytic)
+# why does the variable name change from "YPLLRate_2021" to "analytic2.YPLLRate_2021"?
+YPLLanalytic = rename(YPLLanalytic, YPLLRate_2021= analytic2.YPLLRate_2021)
+names(YPLLanalytic)
+save(YPLLanalytic, file = "YPLLanalytic.RData")
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

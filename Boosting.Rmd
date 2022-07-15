@@ -1,0 +1,141 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r eval = FALSE, echo = FALSE}
+#gbm boosting
+library(gbm)
+rm(list = ls())
+set.seed (1)
+load("YPLLanalytic.RData")
+train = sample(1: nrow(YPLLanalytic), nrow(YPLLanalytic) / 2)
+boost.YPLL = gbm(YPLLRate_2021 ~., data = YPLLanalytic[train, ], distribution = "gaussian", n.trees = 5000, interaction.depth = 4)
+summary(boost.YPLL)
+plot(boost.YPLL , i = "inactivity_2011" )
+plot(boost.YPLL , i = "childpoverty_2017" )
+```
+
+# gbm with caret
+```{r}
+library(caret)
+library(gbm)
+library(plyr)
+rm(list = ls())
+set.seed (1)
+load("YPLLanalytic.RData")
+inTraining = createDataPartition(YPLLanalytic$YPLLRate_2021, p = .75, list = FALSE)
+training = YPLLanalytic[ inTraining,]
+testing  = YPLLanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10)
+gbmGrid =  expand.grid(interaction.depth = c(2, 4, 6, 8), 
+                        n.trees = c(50, 100, 150), 
+                        shrinkage = 0.1,
+                        n.minobsinnode = 20)
+gbmFit1 = train(YPLLRate_2021 ~ ., data = training, 
+                 method = "gbm", 
+                 trControl = fitControl,
+                 tuneGrid = gbmGrid,
+                 verbose = FALSE)
+gbmFit1
+```
+
+# xgboost with caret
+```{r}
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+rm(list = ls())
+set.seed (1)
+load("YPLLanalytic.RData")
+
+nc = parallel::detectCores()  #Detects how many cores current machine has
+cl = makePSOCKcluster(nc-1)   #Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(YPLLanalytic$YPLLRate_2021, p = .75, list = FALSE)
+training = YPLLanalytic[ inTraining,]
+testing  = YPLLanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+xgbGrid = expand.grid(nrounds = c(250, 300, 350, 400),
+                       max_depth = 6,
+                       eta = c(.05),
+                       gamma = 0,
+                       colsample_bytree = c(.7),
+                       min_child_weight = 1,
+                       subsample = c(.9))
+xgbFit1 = train(YPLLRate_2021 ~ ., data = training, 
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid,
+                nthread=1,
+                verbosity = 0
+                )
+plot(xgbFit1)
+
+stopCluster(cl)
+plot(varImp(xgbFit1))
+varImp(xgbFit1)
+xgbFit1
+
+xgb.pdp = list()
+xgb.pdp[[1]] =
+  partial(
+    object = xgbFit1,
+    pred.var = c("childpoverty_2018"),
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+xgb.pdp
+lapply(xgb.pdp, FUN = plotPartial)
+plotPartial(xgb.pdp[[1]], rug =TRUE, train = training)
+#rugplot
+
+```
+
+
+```{r eval = FALSE, echo = FALSE}
+library(xgboost)
+data(agaricus.train, package='xgboost')
+data(agaricus.test, package='xgboost')
+train <- agaricus.train
+test <- agaricus.test
+# fit model
+bst <- xgboost(data = train$data, label = train$label, max.depth = 15, eta = 0.1, nrounds = 10000, nthread = 12, objective = "binary:logistic")
+```
+
+```{r eval = FALSE, echo = FALSE}
+depvarlist = list("MentallyUnhealthyDays_2021",
+            "PhysicallyUnhealthyDays_2021",
+            "YPLLRate_2021",
+            "FairPoor_2021"
+            )
+
+library(gbm)
+call.boosting = function(depvarname) {
+  attach(analytic2)
+  newanalytic=data.frame(analytic2[2:48], depvarname, analytic2[97:156])
+  train = sample(1: nrow(newanalytic), nrow(newanalytic) / 2)
+  set.seed (1)
+  boost.dep = gbm(depvarname ~., data = newanalytic[train, ], distribution = "gaussian", n.trees = 5000, interaction.depth = 4)
+  return(boost.dep)
+}
+
+res.boosting=lapply(depvarlist, call.boosting)
+#something wrong with summary, everything is fine if I individually run it instead of applying to list
+#summary(res.boosting[[1]])
+#show.res.boosting=lapply(res.boosting, summary)
+#show.res.boosting
+```

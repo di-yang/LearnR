@@ -1,0 +1,51 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(ISLR2)
+View(Hitters)
+names(Hitters)
+dim(Hitters)
+sum(is.na(Hitters$Salary))
+Hitters = na.omit(Hitters)
+dim(Hitters)
+sum(is.na(Hitters))
+```
+```{r}
+library(leaps)
+regfit.full = regsubsets(Salary ~ ., Hitters)
+summary(regfit.full)
+regfit.full = regsubsets(Salary ~ ., Hitters, nvmax=19)
+reg.summary = summary(regfit.full)
+names(reg.summary)
+reg.summary$rsq
+par(mfrow = c(2,2))
+plot(reg.summary$rss , xlab =" Number of Variables " , ylab = " RSS" , type = "l" )
+plot(reg.summary$adjr2 , xlab= " Number of Variables " , ylab= " Adjusted RSq" , type= "l" )
+which.max(reg.summary$adjr2)
+points(11, reg.summary$adjr2[11], col = "red" , cex =2, pch = 20)
+```
+Ridge Regression and the Lasso
+```{r}
+x=model.matrix(Salary ~., Hitters)[,-1]
+y=Hitters$Salary
+library(glmnet)
+grid = 10^seq(10, -2, length=100)
+ridge.mod = glmnet(x, y, alpha= 0, lambda=grid)
+dim(coef(ridge.mod))
+ridge.mod$lambda [50]
+sqrt(sum(coef(ridge.mod)[-1, 50]^2))
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

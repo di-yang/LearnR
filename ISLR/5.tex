@@ -1,0 +1,415 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={R Notebook},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{R Notebook}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+This is an \href{http://rmarkdown.rstudio.com}{R Markdown} Notebook.
+When you execute code within the notebook, the results appear beneath
+the code.
+
+Try executing this chunk by clicking the \emph{Run} button within the
+chunk or by placing your cursor inside it and pressing
+\emph{Cmd+Shift+Enter}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ISLR2)}
+\FunctionTok{set.seed}\NormalTok{ (}\DecValTok{1}\NormalTok{)}
+\NormalTok{train}\OtherTok{=}\FunctionTok{sample}\NormalTok{ (}\DecValTok{392}\NormalTok{ , }\DecValTok{196}\NormalTok{)}
+\NormalTok{lm.fit }\OtherTok{=} \FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}}\NormalTok{ horsepower, }\AttributeTok{data =}\NormalTok{ Auto, }\AttributeTok{subset =}\NormalTok{ train)}
+\FunctionTok{attach}\NormalTok{(Auto)}
+\FunctionTok{mean}\NormalTok{((mpg }\SpecialCharTok{{-}} \FunctionTok{predict}\NormalTok{(lm.fit, Auto))[}\SpecialCharTok{{-}}\NormalTok{train]}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 23.26601
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm.fit2 }\OtherTok{=} \FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(horsepower,}\DecValTok{2}\NormalTok{), }\AttributeTok{data =}\NormalTok{ Auto, }\AttributeTok{subset =}\NormalTok{ train)}
+\FunctionTok{mean}\NormalTok{((mpg }\SpecialCharTok{{-}} \FunctionTok{predict}\NormalTok{(lm.fit2, Auto))[}\SpecialCharTok{{-}}\NormalTok{train]}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 18.71646
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm.fit3 }\OtherTok{=} \FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(horsepower,}\DecValTok{2}\NormalTok{), }\AttributeTok{data =}\NormalTok{ Auto, }\AttributeTok{subset =}\NormalTok{ train)}
+\FunctionTok{mean}\NormalTok{((mpg }\SpecialCharTok{{-}} \FunctionTok{predict}\NormalTok{(lm.fit3, Auto))[}\SpecialCharTok{{-}}\NormalTok{train]}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 18.71646
+\end{verbatim}
+
+LOOCV
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# these two are the same}
+\NormalTok{glm.fit }\OtherTok{=} \FunctionTok{glm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}}\NormalTok{ horsepower , }\AttributeTok{data =}\NormalTok{ Auto)}
+\FunctionTok{coef}\NormalTok{(glm.fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)  horsepower 
+##  39.9358610  -0.1578447
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm.fit }\OtherTok{=} \FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}}\NormalTok{ horsepower , }\AttributeTok{data =}\NormalTok{ Auto)}
+\FunctionTok{coef}\NormalTok{(lm.fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)  horsepower 
+##  39.9358610  -0.1578447
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(boot)}
+\NormalTok{cv.err }\OtherTok{\textless{}{-}} \FunctionTok{cv.glm}\NormalTok{(Auto , glm.fit)}
+\NormalTok{cv.err}\SpecialCharTok{$}\NormalTok{delta}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 24.23151 24.23114
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cv.error}\OtherTok{=} \FunctionTok{rep}\NormalTok{(}\FloatTok{0.10}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  glm.fit }\OtherTok{=} \FunctionTok{glm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(horsepower, i) , }\AttributeTok{data =}\NormalTok{ Auto)}
+\NormalTok{  cv.error[i] }\OtherTok{=} \FunctionTok{cv.glm}\NormalTok{(Auto, glm.fit)}\SpecialCharTok{$}\NormalTok{delta[}\DecValTok{1}\NormalTok{]}
+\NormalTok{\}}
+\NormalTok{cv.error}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] 24.23151 19.24821 19.33498 19.42443 19.03321 18.97864 18.83305 18.96115
+##  [9] 19.06863 19.49093
+\end{verbatim}
+
+K-fold
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{ (}\DecValTok{17}\NormalTok{)}
+\NormalTok{cv.error}\FloatTok{.10} \OtherTok{=} \FunctionTok{rep}\NormalTok{(}\FloatTok{0.10}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  glm.fit }\OtherTok{=} \FunctionTok{glm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(horsepower, i) , }\AttributeTok{data =}\NormalTok{ Auto)}
+\NormalTok{  cv.error}\FloatTok{.10}\NormalTok{[i] }\OtherTok{=} \FunctionTok{cv.glm}\NormalTok{(Auto, glm.fit, }\AttributeTok{K=}\DecValTok{10}\NormalTok{)}\SpecialCharTok{$}\NormalTok{delta[}\DecValTok{1}\NormalTok{]}
+\NormalTok{\}}
+\NormalTok{cv.error}\FloatTok{.10}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] 24.27207 19.26909 19.34805 19.29496 19.03198 18.89781 19.12061 19.14666
+##  [9] 18.87013 20.95520
+\end{verbatim}
+
+Bootstrap
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha.fn }\OtherTok{=} \ControlFlowTok{function}\NormalTok{ (data, index) \{}
+\NormalTok{  X}\OtherTok{=}\NormalTok{data}\SpecialCharTok{$}\NormalTok{X[index]}
+\NormalTok{  Y}\OtherTok{=}\NormalTok{data}\SpecialCharTok{$}\NormalTok{Y[index]}
+\NormalTok{  (}\FunctionTok{var}\NormalTok{(Y) }\SpecialCharTok{{-}} \FunctionTok{cov}\NormalTok{(X, Y)) }\SpecialCharTok{/}\NormalTok{ (}\FunctionTok{var}\NormalTok{(X) }\SpecialCharTok{+} \FunctionTok{var}\NormalTok{(Y)}\SpecialCharTok{{-}} \DecValTok{2} \SpecialCharTok{*} \FunctionTok{cov}\NormalTok{(X, Y))}
+\NormalTok{\}}
+\FunctionTok{alpha.fn}\NormalTok{(Portfolio , }\DecValTok{1}\SpecialCharTok{:}\DecValTok{100}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5758321
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{ (}\DecValTok{7}\NormalTok{)}
+\FunctionTok{alpha.fn}\NormalTok{(Portfolio , }\FunctionTok{sample}\NormalTok{ (}\DecValTok{100}\NormalTok{ , }\DecValTok{100}\NormalTok{, }\AttributeTok{replace=}\NormalTok{ T))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5385326
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{boot}\NormalTok{(Portfolio , alpha.fn , }\AttributeTok{R =} \DecValTok{1000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ORDINARY NONPARAMETRIC BOOTSTRAP
+## 
+## 
+## Call:
+## boot(data = Portfolio, statistic = alpha.fn, R = 1000)
+## 
+## 
+## Bootstrap Statistics :
+##      original       bias    std. error
+## t1* 0.5758321 0.0007959475  0.08969074
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Estimating the Accuracy of a Linear Regression Model}
+\NormalTok{boot.fn }\OtherTok{=} \ControlFlowTok{function}\NormalTok{ (data , index) \{}
+  \FunctionTok{coef}\NormalTok{(}\FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}}\NormalTok{ horsepower, }\AttributeTok{data =}\NormalTok{ data, }\AttributeTok{subset =}\NormalTok{ index))}
+\NormalTok{\}}
+\FunctionTok{boot.fn}\NormalTok{(Auto, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{392}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)  horsepower 
+##  39.9358610  -0.1578447
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\FunctionTok{boot.fn}\NormalTok{(Auto, }\FunctionTok{sample}\NormalTok{(}\DecValTok{392}\NormalTok{, }\DecValTok{392}\NormalTok{, }\AttributeTok{replace =}\NormalTok{ T))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)  horsepower 
+##  40.3404517  -0.1634868
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{boot.fn}\NormalTok{(Auto, }\FunctionTok{sample}\NormalTok{(}\DecValTok{392}\NormalTok{, }\DecValTok{392}\NormalTok{, }\AttributeTok{replace =}\NormalTok{ T))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)  horsepower 
+##  40.1186906  -0.1577063
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{boot}\NormalTok{(Auto , boot.fn , }\DecValTok{1000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ORDINARY NONPARAMETRIC BOOTSTRAP
+## 
+## 
+## Call:
+## boot(data = Auto, statistic = boot.fn, R = 1000)
+## 
+## 
+## Bootstrap Statistics :
+##       original        bias    std. error
+## t1* 39.9358610  0.0544513229 0.841289790
+## t2* -0.1578447 -0.0006170901 0.007343073
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}}\NormalTok{ horsepower , }\AttributeTok{data=}\NormalTok{Auto))}\SpecialCharTok{$}\NormalTok{coef}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##               Estimate  Std. Error   t value      Pr(>|t|)
+## (Intercept) 39.9358610 0.717498656  55.65984 1.220362e-187
+## horsepower  -0.1578447 0.006445501 -24.48914  7.031989e-81
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{boot.fn }\OtherTok{=} \ControlFlowTok{function}\NormalTok{ (data , index) \{}
+  \FunctionTok{coef}\NormalTok{(}\FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}}\NormalTok{ horsepower}\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(horsepower}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{), }\AttributeTok{data =}\NormalTok{ data, }\AttributeTok{subset =}\NormalTok{ index))}
+\NormalTok{\}}
+\FunctionTok{set.seed}\NormalTok{ (}\DecValTok{1}\NormalTok{)}
+\FunctionTok{boot}\NormalTok{(Auto, boot.fn, }\DecValTok{1000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ORDINARY NONPARAMETRIC BOOTSTRAP
+## 
+## 
+## Call:
+## boot(data = Auto, statistic = boot.fn, R = 1000)
+## 
+## 
+## Bootstrap Statistics :
+##         original        bias     std. error
+## t1* 56.900099702  3.511640e-02 2.0300222526
+## t2* -0.466189630 -7.080834e-04 0.0324241984
+## t3*  0.001230536  2.840324e-06 0.0001172164
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#remember the raw option in poly}
+\NormalTok{boot.fn }\OtherTok{=} \ControlFlowTok{function}\NormalTok{ (data , index) \{}
+  \FunctionTok{coef}\NormalTok{(}\FunctionTok{lm}\NormalTok{(mpg }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(horsepower,}\DecValTok{2}\NormalTok{, }\AttributeTok{raw =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{data =}\NormalTok{ data, }\AttributeTok{subset =}\NormalTok{ index))}
+\NormalTok{\}}
+\FunctionTok{set.seed}\NormalTok{ (}\DecValTok{1}\NormalTok{)}
+\FunctionTok{boot}\NormalTok{(Auto, boot.fn, }\DecValTok{1000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ORDINARY NONPARAMETRIC BOOTSTRAP
+## 
+## 
+## Call:
+## boot(data = Auto, statistic = boot.fn, R = 1000)
+## 
+## 
+## Bootstrap Statistics :
+##         original        bias     std. error
+## t1* 56.900099702  3.511640e-02 2.0300222526
+## t2* -0.466189630 -7.080834e-04 0.0324241984
+## t3*  0.001230536  2.840324e-06 0.0001172164
+\end{verbatim}
+
+Add a new chunk by clicking the \emph{Insert Chunk} button on the
+toolbar or by pressing \emph{Cmd+Option+I}.
+
+When you save the notebook, an HTML file containing the code and output
+will be saved alongside it (click the \emph{Preview} button or press
+\emph{Cmd+Shift+K} to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the
+editor. Consequently, unlike \emph{Knit}, \emph{Preview} does not run
+any R code chunks. Instead, the output of the chunk when it was last run
+in the editor is displayed.
+
+\end{document}

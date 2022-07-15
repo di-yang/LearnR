@@ -1,0 +1,88 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tree, ISLR2)
+attach(Carseats)
+High = factor(ifelse(Sales <= 8, "No" , "Yes" ))
+Carseats = data.frame(Carseats , High)
+tree.carseats = tree(High ~ . -Sales, Carseats)
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats, pretty = 0)
+tree.carseats
+```
+```{r}
+set.seed (2)
+train = sample (1: nrow(Carseats), 200)
+Carseats.test = Carseats[-train , ]
+High.test <- High[-train]
+tree.carseats = tree(High ~ . -Sales, Carseats, subset = train)
+tree.pred = predict(tree.carseats, Carseats.test, type = "class")
+table(tree.pred, High.test)
+
+```
+```{r}
+set.seed (7)
+cv.carseats = cv.tree(tree.carseats, FUN = prune.misclass)
+names(cv.carseats)
+cv.carseats
+par(mfrow = c(1,2))
+plot(cv.carseats$size, cv.carseats$dev, type = "b" )
+plot(cv.carseats$k, cv.carseats$dev, type = "b" )
+prune.carseats = prune.misclass(tree.carseats , best = 9)
+plot(prune.carseats)
+text(prune.carseats , pretty =0)
+tree.pred = predict(prune.carseats, Carseats.test, type = "class")
+table(tree.pred, High.test)
+```
+regression tree
+```{r}
+set.seed(1)
+train = sample(1: nrow(Boston), nrow(Boston) / 2)
+tree.boston = tree(medv ~ ., Boston, subset = train)
+summary(tree.boston)
+plot(tree.boston)
+text(tree.boston , pretty = 0)
+cv.boston <- cv.tree(tree.boston)
+plot(cv.boston$size , cv.boston$dev , type ="b" )
+prune.boston=prune.tree(tree.boston, best= 5)
+plot(prune.boston)
+text(prune.boston , pretty =0)
+yhat = predict(tree.boston ,newdata =Boston[-train ,])
+boston.test = Boston[-train , "medv" ]
+plot(yhat, boston.test)
+abline(0, 1)
+mean((yhat - boston.test)^2)
+```
+```{r}
+library(randomForest)
+set.seed(1)
+bag.boston = randomForest(medv ~ ., data = Boston, subset= train, mtry=12, importance=TRUE)
+bag.boston
+yhat.bag = predict(bag.boston , newdata = Boston[-train , ])
+plot(yhat.bag, boston.test)
+abline(0, 1)
+mean((yhat.bag - boston.test)^2)
+```
+```{r}
+library(gbm)
+set.seed (1)
+boost.boston = gbm(medv ~., data = Boston[train, ], distribution = "gaussian", n.trees = 5000, interaction.depth = 4)
+summary(boost.boston)
+plot(boost.boston , i = "rm" )
+plot(boost.boston , i = "lstat" )
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
