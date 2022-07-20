@@ -68,74 +68,157 @@ fitControl = trainControl(method = "repeatedcv",
                            repeats = 10,
                           allowParallel=TRUE
                           )
-xgbGrid = expand.grid(nrounds = c(250, 300, 350, 400),
-                       max_depth = 6,
-                       eta = c(.05),
+xgbGrid1 = expand.grid(nrounds = c(250, 300, 350, 400), #200, 300
+                       max_depth = 6, #2, 4, 6
+                       eta = c(.05),  # 0.05, 0.075
                        gamma = 0,
-                       colsample_bytree = c(.7),
+                       colsample_bytree = c(.7), #6, 7, 8
                        min_child_weight = 1,
-                       subsample = c(.9))
-xgbFit1 = train(YPLLRate_2021 ~ ., data = training, 
+                       subsample = c(.9)) #0.9, 1
+xgbFit1 = train(YPLLRate_2021 ~ ., data = training,  #dependent var should be 2020-2017
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid1,
+                nthread=1,
+                verbosity = 0
+                )
+stopCluster(cl)
+plot(varImp(xgbFit1)) # a very messy plot
+vi=varImp(xgbFit1) # much better in a list
+xgbFit1
+```
+
+```{r}
+xgb.pdp = list()
+res.partialplot = list()
+predvarls = list("childpoverty_2018", "inactivity_2011", "obesity_2010", "somecollege_2010", "PM25_2019", "PCPRate_2010", "uninsuredrate_2013", "highschool_2010", "unemploymentrate_2013")
+for (m in 1:length(predvarls)){
+xgb.pdp[[m]] = 
+  partial(
+    object = xgbFit1,
+    pred.var = predvarls[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot[[m]]=plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(5000, 10000))
+}
+#lapply(xgb.pdp, plotPartial)
+res.partialplot[[9]]
+```
+
+```{r}
+xgb.pdp = list()
+res.partialplot = list()
+predvarls = list("childpoverty_2018", "childpoverty_2017", "childpoverty_2015", "inactivity_2011", "childpoverty_2019", "inactivity_2019")
+for (m in 1:length(predvarls)){
+xgb.pdp[[m]] = 
+  partial(
+    object = xgbFit1,
+    pred.var = predvarls[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot[[m]]=plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(5000, 10000))
+}
+res.partialplot[[6]]
+```
+
+
+```{r}
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+rm(list = ls())
+set.seed (1)
+load("physicalanalytic.RData")
+
+nc = parallel::detectCores()  #Detects how many cores current machine has
+cl = makePSOCKcluster(nc-1)   #Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(physicalanalytic$PhysicallyUnhealthyDays_2021, p = .75, list = FALSE)
+training = physicalanalytic[ inTraining,]
+testing  = physicalanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+xgbGrid = expand.grid(nrounds = c(250, 300, 350),
+                       max_depth = 6,
+                       eta = c(0.05, 0.1, 0.2),
+                       gamma = 0,
+                       colsample_bytree = c(0.6, 0.7, 0.8),
+                       min_child_weight = 1,
+                       subsample = c(0.8, 0.9, 1))
+xgbFit2 = train(PhysicallyUnhealthyDays_2021 ~ ., data = training, 
                  method = "xgbTree", 
                  trControl = fitControl,
                  tuneGrid = xgbGrid,
                 nthread=1,
                 verbosity = 0
                 )
-plot(xgbFit1)
+stopCluster(cl)
+plot(varImp(xgbFit2)) # a very messy plot
+varImp(xgbFit2) # much better in a list
+xgbFit2
+```
+
+# xgboost for YPLL difference
+```{r}
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+rm(list = ls())
+set.seed (1)
+load("analytic2.RData")
+analytic2$YPLLdiff=analytic2$YPLLRate_2020-analytic2$YPLLRate_2017
+names(analytic2)
+YPLLanalytic=data.frame( analytic2[2:15], analytic2[20:28], analytic2[31:45], analytic2[97:102], analytic2[108:113], analytic2[119:120], analytic2[124:128], analytic2[134:140], analytic2[146:150], analytic2["YPLLdiff"] )
+names(YPLLanalytic)
+
+nc = parallel::detectCores()  # R detected 6 cores on Mac mini but 12 cores on MacBook. Both computers have 6 physical cores, I guess it's hyperthreading
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(YPLLanalytic$YPLLdiff, p = .75, list = FALSE)
+training = YPLLanalytic[ inTraining,]
+testing  = YPLLanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+
+xgbGrid1 = expand.grid(nrounds = c(200, 300), #200, 300
+                       max_depth = c(2 ,4 ,6), #2, 4, 6
+                       eta = c(0.05, 0.075),  # 0.05, 0.075
+                       gamma = 0,
+                       colsample_bytree = c(0.6, 0.7, 0.8), #6, 7, 8
+                       min_child_weight = 1,
+                       subsample = c(0.9, 1)) #0.9, 1
+
+xgbFit1 = train(YPLLdiff ~ ., data = training,  #dependent var should be 2020-2017
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid1,
+                nthread=1,
+                verbosity = 0
+                )
 
 stopCluster(cl)
-plot(varImp(xgbFit1))
-varImp(xgbFit1)
+plot(varImp(xgbFit1)) # a very messy plot
+vi=varImp(xgbFit1) # much better in a list
+vi$importance
 xgbFit1
-
-xgb.pdp = list()
-xgb.pdp[[1]] =
-  partial(
-    object = xgbFit1,
-    pred.var = c("childpoverty_2018"),
-    plot = FALSE,
-    chull = TRUE,
-    plot.engine = "ggplot2"
-  )
-xgb.pdp
-lapply(xgb.pdp, FUN = plotPartial)
-plotPartial(xgb.pdp[[1]], rug =TRUE, train = training)
-#rugplot
-
 ```
 
 
-```{r eval = FALSE, echo = FALSE}
-library(xgboost)
-data(agaricus.train, package='xgboost')
-data(agaricus.test, package='xgboost')
-train <- agaricus.train
-test <- agaricus.test
-# fit model
-bst <- xgboost(data = train$data, label = train$label, max.depth = 15, eta = 0.1, nrounds = 10000, nthread = 12, objective = "binary:logistic")
-```
 
-```{r eval = FALSE, echo = FALSE}
-depvarlist = list("MentallyUnhealthyDays_2021",
-            "PhysicallyUnhealthyDays_2021",
-            "YPLLRate_2021",
-            "FairPoor_2021"
-            )
 
-library(gbm)
-call.boosting = function(depvarname) {
-  attach(analytic2)
-  newanalytic=data.frame(analytic2[2:48], depvarname, analytic2[97:156])
-  train = sample(1: nrow(newanalytic), nrow(newanalytic) / 2)
-  set.seed (1)
-  boost.dep = gbm(depvarname ~., data = newanalytic[train, ], distribution = "gaussian", n.trees = 5000, interaction.depth = 4)
-  return(boost.dep)
-}
-
-res.boosting=lapply(depvarlist, call.boosting)
-#something wrong with summary, everything is fine if I individually run it instead of applying to list
-#summary(res.boosting[[1]])
-#show.res.boosting=lapply(res.boosting, summary)
-#show.res.boosting
-```

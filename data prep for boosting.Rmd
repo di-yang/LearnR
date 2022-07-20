@@ -8,6 +8,7 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
+rm(list = ls())
 library(tidyverse)
 library(readxl)
 filenames <- list.files("./Ranked Measure Data")
@@ -137,12 +138,42 @@ save(analytic2, file = "analytic2.RData")
 ```
 
 ```{r}
-YPLLanalytic=data.frame(analytic2[2:48], analytic2$YPLLRate_2021, analytic2[97:156])
-names(YPLLanalytic)
+YPLLanalytic=data.frame(analytic2[2:48], analytic2["YPLLRate_2021"], analytic2[97:156])
+#names(YPLLanalytic)=names(analytic2)[c(2:48, 60, 97:156)]
 # why does the variable name change from "YPLLRate_2021" to "analytic2.YPLLRate_2021"?
-YPLLanalytic = rename(YPLLanalytic, YPLLRate_2021= analytic2.YPLLRate_2021)
+#YPLLanalytic = rename(YPLLanalytic, YPLLRate_2021 = analytic2.YPLLRate_2021)
 names(YPLLanalytic)
 save(YPLLanalytic, file = "YPLLanalytic.RData")
+```
+
+```{r}
+rm(list = ls())
+load("analytic2.RData")
+physicalanalytic=data.frame(analytic2[2:48], analytic2$PhysicallyUnhealthyDays_2021, analytic2[97:156])
+names(physicalanalytic)
+physicalanalytic = physicalanalytic %>% rename(PhysicallyUnhealthyDays_2021 = analytic2.PhysicallyUnhealthyDays_2021)
+names(physicalanalytic)
+save(physicalanalytic, file = "physicalanalytic.RData")
+```
+
+```{r}
+rm(list = ls())
+load("analytic2.RData")
+mentalanalytic=data.frame(analytic2[2:48], analytic2$MentallyUnhealthyDays_2021, analytic2[97:156])
+names(mentalanalytic)
+mentalanalytic = mentalanalytic %>% rename(MentallyUnhealthyDays_2021 = analytic2.MentallyUnhealthyDays_2021)
+names(mentalanalytic)
+save(mentalanalytic, file = "mentalanalytic.RData")
+```
+
+```{r}
+rm(list = ls())
+load("analytic2.RData")
+fairpooranalytic=data.frame(analytic2[2:48], analytic2$FairPoor_2021, analytic2[97:156])
+names(fairpooranalytic)
+fairpooranalytic = fairpooranalytic %>% rename(FairPoor_2021 = analytic2.FairPoor_2021)
+names(fairpooranalytic)
+save(fairpooranalytic, file = "fairpooranalytic.RData")
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.

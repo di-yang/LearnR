@@ -1,0 +1,57 @@
+---
+title: "XGB on 2020-2017 YPLL Difference"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+rm(list = ls())
+set.seed (1)
+load("analytic2.RData")
+analytic2$YPLLdiff=analytic2$YPLLRate_2020-analytic2$YPLLRate_2017
+names(analytic2)
+YPLLanalytic=data.frame( analytic2[2:15], analytic2[20:28], analytic2[31:45], analytic2[97:102], analytic2[108:113], analytic2[119:120], analytic2[124:128], analytic2[134:140], analytic2[146:150], analytic2["YPLLdiff"] )
+names(YPLLanalytic)
+
+nc = parallel::detectCores()  # R detected 6 cores on Mac mini but 12 cores on MacBook. Both computers have 6 physical cores, I guess it's hyperthreading
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(YPLLanalytic$YPLLdiff, p = .75, list = FALSE)
+training = YPLLanalytic[ inTraining,]
+testing  = YPLLanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+
+xgbGrid1 = expand.grid(nrounds = c(200, 300), #200, 300
+                       max_depth = c(2 ,4 ,6), #2, 4, 6
+                       eta = c(0.05, 0.075),  # 0.05, 0.075
+                       gamma = 0,
+                       colsample_bytree = c(0.6, 0.7, 0.8), #6, 7, 8
+                       min_child_weight = 1,
+                       subsample = c(0.9, 1)) #0.9, 1
+
+xgbFit1 = train(YPLLdiff ~ ., data = training,  #dependent var should be 2020-2017
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid1,
+                nthread=1,
+                verbosity = 0
+                )
+
+stopCluster(cl)
+plot(varImp(xgbFit1)) # a very messy plot
+vi=varImp(xgbFit1) # much better in a list
+vi$importance
+xgbFit1
+```
+
