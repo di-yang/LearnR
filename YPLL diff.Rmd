@@ -32,9 +32,9 @@ fitControl = trainControl(method = "repeatedcv",
                           allowParallel=TRUE
                           )
 
-xgbGrid1 = expand.grid(nrounds = c(100, 200, 300), #200, 300
+xgbGrid1 = expand.grid(nrounds = c(100, 200, 300, 400), #200, 300
                        max_depth = c(1, 2 ,4, 6), #2, 4, 6
-                       eta = c(0.01, 0.025, 0.05, 0.075),  # 0.05, 0.075
+                       eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
                        gamma = 0,
                        colsample_bytree = c(0.2, 0.3, 0.6), #6, 7, 8
                        min_child_weight = 1,
@@ -55,3 +55,27 @@ vi$importance
 xgbFit1
 ```
 
+```{r}
+xgb.pdp = list()
+res.partialplot = list()
+predvarls = list("childpoverty_2018", "childpoverty_2017", "childpoverty_2015", "inactivity_2011", "childpoverty_2019", "inactivity_2019")
+for (m in 1:length(predvarls)){
+xgb.pdp[[m]] = 
+  partial(
+    object = xgbFit1,
+    pred.var = predvarls[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot[[m]]=plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(5000, 10000))
+}
+res.partialplot[[1]]
+res.partialplot[[2]]
+res.partialplot[[3]]
+res.partialplot[[4]]
+res.partialplot[[5]]
+res.partialplot[[6]]
+res.partialplot[[7]]
+res.partialplot[[8]]
+```
