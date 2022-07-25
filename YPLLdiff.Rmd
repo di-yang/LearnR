@@ -16,7 +16,8 @@ set.seed (1)
 load("analytic2.RData")
 analytic2$YPLLdiff=analytic2$YPLLRate_2020-analytic2$YPLLRate_2017
 names(analytic2)
-YPLLanalytic=data.frame( analytic2[2:15], analytic2[20:28], analytic2[31:45], analytic2[97:102], analytic2[108:113], analytic2[119:120], analytic2[124:128], analytic2[134:140], analytic2[146:150], analytic2["YPLLdiff"] )
+
+YPLLanalytic=data.frame( analytic2[2:15], analytic2[20:28], analytic2[31:45], analytic2[99:102], analytic2[108:113], analytic2[119:120], analytic2[124:128], analytic2[134:140], analytic2[146:150], analytic2["YPLLdiff"] )
 names(YPLLanalytic)
 
 nc = parallel::detectCores()  # R detected 6 cores on Mac mini but 12 cores on MacBook. Both computers have 6 physical cores, I guess it's hyperthreading

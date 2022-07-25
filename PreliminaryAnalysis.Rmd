@@ -167,7 +167,7 @@ call.lm = function(depvarname){
   res.reg = lapply(depvarlist, call.lm)
   show.res.reg=lapply(res.reg,summary)
   show.res.reg
- 
+  res.reg[[1]]$coefficients["unemploymentrate_2002"]
 ```
 
 ```{r}
