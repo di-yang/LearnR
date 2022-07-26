@@ -59,7 +59,7 @@ xgbFit1
 ```{r}
 xgb.pdp = list()
 res.partialplot = list()
-predvarls = list("PCPRate_2011", "inactivity_2015", "PM25_2013", "PCPRate_2013", "somecollege_2014", "PCPRate_2010", "PCPRate_2016", "PM25_2014", "somecollege_2012", "obesity_2012")
+predvarls = list("PCPRate_2014", "PCPRate_2016", "somecollege_2012", "PM25_2013", "PM25_2014", "PCPRate_2013", "somecollege_2011", "PCPRate_2015", "inactivity_2012", "somecollege_2012")
 for (m in 1:length(predvarls)){
 xgb.pdp[[m]] = 
   partial(
