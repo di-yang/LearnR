@@ -1,0 +1,272 @@
+---
+title: "XGB on 2020-2017 YPLL Difference"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library(caret)
+library(xgboost)
+library(doParallel)
+library(pdp)
+library(tidyverse)
+library(naniar)
+rm(list = ls())
+set.seed (1)
+load("analytic2.RData")
+analytic2$YPLLdiff=analytic2$YPLLRate_2020-analytic2$YPLLRate_2017
+names(analytic2)
+
+analytic3=data.frame(analytic2[1])
+analytic3=analytic3 %>% mutate(YPLLdif = analytic2$YPLLRate_2019 - analytic2$YPLLRate_2015)
+names(analytic3)
+summary(analytic3$YPLLdif)
+
+# unemployment
+unemploymentanalytic=data.frame(analytic2[1], analytic2[10:14])
+unemploymentanalytic=unemploymentanalytic %>% pivot_longer(c("unemploymentrate_2010", "unemploymentrate_2011", "unemploymentrate_2012", "unemploymentrate_2013", "unemploymentrate_2014"), names_to = "year", values_to = "value")
+unemploymentanalytic=unemploymentanalytic %>% 
+  mutate( year = case_when(
+  year=="unemploymentrate_2010" ~ 1,
+  year=="unemploymentrate_2011" ~ 2,
+  year=="unemploymentrate_2012" ~ 3,
+  year=="unemploymentrate_2013" ~ 4,
+  year=="unemploymentrate_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(unemploymentanalytic)
+analytic3=analytic3 %>% mutate(unemploymenta=NA, unemploymentb=NA)
+for (row in 1:nrow(analytic3)){
+  county = unemploymentanalytic %>% filter(unemploymentanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "unemploymenta"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "unemploymentb"]=res.lm$coefficients["county$year"]
+}
+
+# uninsured
+uninsuredanalytic=data.frame(analytic2[1], analytic2[22:26])
+uninsuredanalytic=uninsuredanalytic %>% pivot_longer(c("uninsuredrate_2010", "uninsuredrate_2011", "uninsuredrate_2012", "uninsuredrate_2013", "uninsuredrate_2014"), names_to = "year", values_to = "value")
+uninsuredanalytic=uninsuredanalytic %>% 
+  mutate( year = case_when(
+  year=="uninsuredrate_2010" ~ 1,
+  year=="uninsuredrate_2011" ~ 2,
+  year=="uninsuredrate_2012" ~ 3,
+  year=="uninsuredrate_2013" ~ 4,
+  year=="uninsuredrate_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(uninsuredanalytic)
+analytic3=analytic3 %>% mutate(uninsureda=NA, uninsuredb=NA)
+for (row in 1:nrow(analytic3)){
+  county = uninsuredanalytic %>% filter(uninsuredanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "uninsureda"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "uninsuredb"]=res.lm$coefficients["county$year"]
+}
+
+# childpoverty
+childpovertyanalytic=data.frame(analytic2[1], analytic2[39:43])
+childpovertyanalytic=childpovertyanalytic %>% pivot_longer(c("childpoverty_2010", "childpoverty_2011", "childpoverty_2012", "childpoverty_2013", "childpoverty_2014"), names_to = "year", values_to = "value")
+childpovertyanalytic=childpovertyanalytic %>% 
+  mutate( year = case_when(
+  year=="childpoverty_2010" ~ 1,
+  year=="childpoverty_2011" ~ 2,
+  year=="childpoverty_2012" ~ 3,
+  year=="childpoverty_2013" ~ 4,
+  year=="childpoverty_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(childpovertyanalytic)
+analytic3=analytic3 %>% mutate(childpovertya=NA, childpovertyb=NA)
+for (row in 1:nrow(analytic3)){
+  county = childpovertyanalytic %>% filter(childpovertyanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "childpovertya"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "childpovertyb"]=res.lm$coefficients["county$year"]
+}
+
+# PCPRate
+pcpanalytic=data.frame(analytic2[1], analytic2[97:100])
+pcpanalytic=pcpanalytic %>% pivot_longer(c("PCPRate_2010", "PCPRate_2011", "PCPRate_2013", "PCPRate_2014"), names_to = "year", values_to = "value")
+pcpanalytic=pcpanalytic %>% 
+  mutate( year = case_when(
+  year=="PCPRate_2010" ~ 1,
+  year=="PCPRate_2011" ~ 2,
+  year=="PCPRate_2012" ~ 3,
+  year=="PCPRate_2013" ~ 4,
+  year=="PCPRate_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(pcpanalytic)
+analytic3=analytic3 %>% mutate(PCPRatea=NA, PCPRateb=NA)
+for (row in 1:nrow(analytic3)){
+  county = pcpanalytic %>% filter(pcpanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "PCPRatea"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "PCPRateb"]=res.lm$coefficients["county$year"]
+}
+
+# obesity
+obesityanalytic=data.frame(analytic2[1], analytic2[108:111])
+obesityanalytic=obesityanalytic %>% pivot_longer(c("obesity_2010", "obesity_2011", "obesity_2012", "obesity_2014"), names_to = "year", values_to = "value")
+obesityanalytic=obesityanalytic %>% 
+  mutate( year = case_when(
+  year=="obesity_2010" ~ 1,
+  year=="obesity_2011" ~ 2,
+  year=="obesity_2012" ~ 3,
+  year=="obesity_2013" ~ 4,
+  year=="obesity_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(obesityanalytic)
+analytic3=analytic3 %>% mutate(obesitya=NA, obesityb=NA)
+for (row in 1:nrow(analytic3)){
+  county = obesityanalytic %>% filter(obesityanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "obesitya"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "obesityb"]=res.lm$coefficients["county$year"]
+}
+
+# inactivity
+inactivityanalytic=data.frame(analytic2[1], analytic2[124:126])
+inactivityanalytic=inactivityanalytic %>% pivot_longer(c("inactivity_2011", "inactivity_2012", "inactivity_2014"), names_to = "year", values_to = "value")
+inactivityanalytic=inactivityanalytic %>% 
+  mutate( year = case_when(
+  year=="inactivity_2010" ~ 1,
+  year=="inactivity_2011" ~ 2,
+  year=="inactivity_2012" ~ 3,
+  year=="inactivity_2013" ~ 4,
+  year=="inactivity_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(inactivityanalytic)
+analytic3=analytic3 %>% mutate(inactivitya=NA, inactivityb=NA)
+for (row in 1:nrow(analytic3)){
+  county = inactivityanalytic %>% filter(inactivityanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "inactivitya"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "inactivityb"]=res.lm$coefficients["county$year"]
+}
+
+# somecollege
+somecollegeanalytic=data.frame(analytic2[1], analytic2[134:138])
+somecollegeanalytic=somecollegeanalytic %>% pivot_longer(c("somecollege_2010", "somecollege_2011", "somecollege_2012", "somecollege_2013", "somecollege_2014"), names_to = "year", values_to = "value")
+somecollegeanalytic=somecollegeanalytic %>% 
+  mutate( year = case_when(
+  year=="somecollege_2010" ~ 1,
+  year=="somecollege_2011" ~ 2,
+  year=="somecollege_2012" ~ 3,
+  year=="somecollege_2013" ~ 4,
+  year=="somecollege_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(somecollegeanalytic)
+analytic3=analytic3 %>% mutate(somecollegea=NA, somecollegeb=NA)
+for (row in 1:nrow(analytic3)){
+  county = somecollegeanalytic %>% filter(somecollegeanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "somecollegea"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "somecollegeb"]=res.lm$coefficients["county$year"]
+}
+
+# highschool
+highschoolanalytic=data.frame(analytic2[1], analytic2[146:150])
+highschoolanalytic=highschoolanalytic %>% pivot_longer(c("highschool_2010", "highschool_2011", "highschool_2012", "highschool_2013", "highschool_2014"), names_to = "year", values_to = "value")
+highschoolanalytic=highschoolanalytic %>% 
+  mutate( year = case_when(
+  year=="highschool_2010" ~ 1,
+  year=="highschool_2011" ~ 2,
+  year=="highschool_2012" ~ 3,
+  year=="highschool_2013" ~ 4,
+  year=="highschool_2014" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+# the console give "Warning: NAs introduced by coercion" but actually no NA???
+pct_miss(highschoolanalytic)
+analytic3=analytic3 %>% mutate(highschoola=NA, highschoolb=NA)
+for (row in 1:nrow(analytic3)){
+  county = highschoolanalytic %>% filter(highschoolanalytic$FIPS == analytic3[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analytic3[row, "highschoola"]=res.lm$coefficients["(Intercept)"]
+  analytic3[row, "highschoolb"]=res.lm$coefficients["county$year"]
+}
+
+YPLLanalytic=analytic3
+analyticvarls=data.frame( analytic2[10:14], analytic2[22:26], analytic2[39:43], analytic2[54], analytic2[58], analytic2[97:100], analytic2[108:111], analytic2[124:126], analytic2[134:138], analytic2[146:150] )
+names(analyticvarls)
+names(analytic2)
+
+```
+
+```{r}
+nc = parallel::detectCores()  # R detected 6 cores on Mac mini but 12 cores on MacBook. Both computers have 6 physical cores, I guess it's hyperthreading
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(YPLLanalytic$YPLLdiff, p = .75, list = FALSE)
+training = YPLLanalytic[ inTraining,]
+testing  = YPLLanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+
+xgbGrid1 = expand.grid(nrounds = c(200, 300, 400), #200, 300
+                       max_depth = c(2, 4, 6, 8), #2, 4, 6
+                       eta = c(0.01, 0.025, 0.05,  0.075),  # 0.05, 0.075
+                       gamma = 0,
+                       colsample_bytree = c(0.2, 0.3, 0.6, 0.7, 0.8), #6, 7, 8
+                       min_child_weight = 1,
+                       subsample = c(0.8, 0.9, 1 )) #0.9, 1
+
+xgbFit1 = train(YPLLdiff ~ ., data = training,  #dependent var should be 2020-2017
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid1,
+                nthread=1,
+                verbosity = 0
+                )
+
+stopCluster(cl)
+plot(varImp(xgbFit1)) # a very messy plot
+vi=varImp(xgbFit1) # much better in a list
+vi$importance
+xgbFit1
+```
+
+```{r}
+xgb.pdp = list()
+res.partialplot = list()
+predvarls = list("PCPRate_2011", "inactivity_2015", "PM25_2013", "PCPRate_2013", "somecollege_2014", "PCPRate_2010", "PCPRate_2016", "PM25_2014", "somecollege_2012", "obesity_2012")
+for (m in 1:length(predvarls)){
+xgb.pdp[[m]] = 
+  partial(
+    object = xgbFit1,
+    pred.var = predvarls[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+summary(YPLLanalytic$YPLLdiff)
+res.partialplot[[m]]=plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(-1000, 1000))
+}
+res.partialplot[[1]]
+res.partialplot[[2]]
+res.partialplot[[3]]
+res.partialplot[[4]]
+res.partialplot[[5]]
+res.partialplot[[6]]
+res.partialplot[[7]]
+res.partialplot[[8]]
+res.partialplot[[9]]
+res.partialplot[[10]]
+```
