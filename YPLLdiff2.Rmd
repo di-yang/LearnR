@@ -28,7 +28,7 @@ fitControl = trainControl(method = "repeatedcv",
                           )
 
 xgbGrid1 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
-                       max_depth = c(2), #2, 4, 6
+                       max_depth = c(1, 2, 3), #2, 4, 6
                        eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
                        gamma = 0,
                        colsample_bytree = c(0.8, 0.9, 1), #6, 7, 8
