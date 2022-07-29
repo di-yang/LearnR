@@ -48,12 +48,13 @@ plot(varImp(xgbFit1)) # a very messy plot
 vi=varImp(xgbFit1) # much better in a list
 vi$importance
 xgbFit1
+plot(xgbFit1)
 ```
 
 ```{r}
 xgb.pdp = list()
 res.partialplot = list()
-predvarls = list("obesitya", "inactivitya", "unemploymenta", "somecollegea", "highschoola","inactivityb", "childpovertya", "somecollegeb", "PCPRatea", "unemploymentb" )
+predvarls = list("obesitya", "somecollegea", "highschoola", "unemploymenta", "inactivitya", "PCPRateb", "inactivityb", "PCPRatea", "unemploymentb", "uninsureda")
 summary(YPLLanalytic$YPLLdif)
 
 for (m in 1:length(predvarls)){
