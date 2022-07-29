@@ -54,7 +54,7 @@ plot(xgbFit1)
 ```{r}
 xgb.pdp = list()
 res.partialplot = list()
-predvarls = list("obesitya", "unemploymenta", "somecollegea", "inactivityb", "childpovertya", "highschoolb", "inactivitya", "childpovertyb", "highschoola", "somecollegeb")
+predvarls = list("obesitya", "inactivitya", "unemploymenta", "somecollegea", "highschoola", "inactivityb", "childpovertya", "somecollegeb", "PCPRatea", "unemploymentb")
 summary(YPLLanalytic$YPLLdif)
 
 for (m in 1:length(predvarls)){
@@ -80,3 +80,6 @@ res.partialplot[[8]]
 res.partialplot[[9]]
 res.partialplot[[10]]
 ```
+
+
+

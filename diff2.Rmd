@@ -45,8 +45,8 @@ xgbFit1 = train(YPLLdif ~ ., data = training,
                 )
 
 stopCluster(cl)
-plot(varImp(xgbFit1)) # a very messy plot
-vi=varImp(xgbFit1) # much better in a list
+plot(varImp(xgbFit1))
+vi=varImp(xgbFit1)
 vi$importance
 xgbFit1
 plot(xgbFit1)
@@ -55,7 +55,7 @@ plot(xgbFit1)
 ```{r}
 xgb.pdp = list()
 res.partialplot = list()
-predvarls = list("obesitya", "unemploymenta", "somecollegea", "inactivityb", "childpovertya", "highschoolb", "inactivitya", "childpovertyb", "highschoola", "somecollegeb")
+predvarls = list("obesitya", "inactivitya", "unemploymenta", "somecollegea", "highschoola", "inactivityb", "childpovertya", "somecollegeb", "PCPRatea", "unemploymentb")
 summary(YPLLanalytic$YPLLdif)
 
 for (m in 1:length(predvarls)){
@@ -69,9 +69,17 @@ xgb.pdp[[m]] =
   )
 res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = training)
 }
-for (i in 1:10){
-  res.partialplot[[i]]
-}
+
+res.partialplot[[1]]
+res.partialplot[[2]]
+res.partialplot[[3]]
+res.partialplot[[4]]
+res.partialplot[[5]]
+res.partialplot[[6]]
+res.partialplot[[7]]
+res.partialplot[[8]]
+res.partialplot[[9]]
+res.partialplot[[10]]
 ```
 
 # mental
@@ -115,8 +123,8 @@ xgbFit2 = train(mentaldif ~ ., data = training,
                 )
 
 stopCluster(cl)
-plot(varImp(xgbFit2)) # a very messy plot
-vi=varImp(xgbFit2) # much better in a list
+plot(varImp(xgbFit2)) 
+vi=varImp(xgbFit2)
 vi$importance
 xgbFit2
 plot(xgbFit2)
@@ -125,7 +133,7 @@ plot(xgbFit2)
 ```{r}
 xgb.pdp2 = list()
 res.partialplot2 = list()
-predvarls2 = list("obesitya", "unemploymenta", "somecollegea", "inactivityb", "childpovertya", "highschoolb", "inactivitya", "childpovertyb", "highschoola", "somecollegeb")
+predvarls2 = list("inactivitya", "somecollegea", "obesitya", "uninsuredb", "highschoolb", "unemploymenta", "somecollegeb", "childpovertya", "uninsureda", "highschoola")
 summary(mentalanalytic$mentaldif)
 
 for (m in 1:length(predvarls2)){
@@ -140,9 +148,16 @@ xgb.pdp2[[m]] =
 res.partialplot2[[m]] = plotPartial(xgb.pdp2[[m]], rug =TRUE, train = training)
 }
 
-for (i in 1:10){
-  res.partialplot2[[i]]
-}
+res.partialplot2[[1]]
+res.partialplot2[[2]]
+res.partialplot2[[3]]
+res.partialplot2[[4]]
+res.partialplot2[[5]]
+res.partialplot2[[6]]
+res.partialplot2[[7]]
+res.partialplot2[[8]]
+res.partialplot2[[9]]
+res.partialplot2[[10]]
 ```
 
 # physical
@@ -186,8 +201,8 @@ xgbFit3 = train(physicaldif ~ ., data = training,
                 )
 
 stopCluster(cl)
-plot(varImp(xgbFit3)) # a very messy plot
-vi=varImp(xgbFit3) # much better in a list
+plot(varImp(xgbFit3)) 
+vi=varImp(xgbFit3) 
 vi$importance
 xgbFit3
 plot(xgbFit3)
@@ -196,7 +211,7 @@ plot(xgbFit3)
 ```{r}
 xgb.pdp3 = list()
 res.partialplot3 = list()
-predvarls3 = list("obesitya", "unemploymenta", "somecollegea", "inactivityb", "childpovertya", "highschoolb", "inactivitya", "childpovertyb", "highschoola", "somecollegeb")
+predvarls3 = list("somecollegea", "uninsureda", "childpovertya", "inactivitya", "highschoolb", "highschoola", "PCPRatea", "childpovertyb", "unemploymenta", "inactivityb")
 summary(physicalanalytic$physicaldif)
 
 for (m in 1:length(predvarls3)){
@@ -211,9 +226,16 @@ xgb.pdp3[[m]] =
 res.partialplot3[[m]] = plotPartial(xgb.pdp3[[m]], rug =TRUE, train = training)
 }
 
-for (i in 1:10){
-  res.partialplot3[[i]]
-}
+res.partialplot3[[1]]
+res.partialplot3[[2]]
+res.partialplot3[[3]]
+res.partialplot3[[4]]
+res.partialplot3[[5]]
+res.partialplot3[[6]]
+res.partialplot3[[7]]
+res.partialplot3[[8]]
+res.partialplot3[[9]]
+res.partialplot3[[10]]
 ```
 
 # fairpoor
@@ -248,7 +270,7 @@ xgbGrid4 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
                        min_child_weight = 20,
                        subsample = c(0.8, 0.9, 1 )) #0.9, 1
 
-xgbFit4 = train(mentaldif ~ ., data = training,
+xgbFit4 = train(fairpoordif ~ ., data = training,
                  method = "xgbTree", 
                  trControl = fitControl,
                  tuneGrid = xgbGrid4,
@@ -257,8 +279,8 @@ xgbFit4 = train(mentaldif ~ ., data = training,
                 )
 
 stopCluster(cl)
-plot(varImp(xgbFit4)) # a very messy plot
-vi=varImp(xgbFit4) # much better in a list
+plot(varImp(xgbFit4))
+vi=varImp(xgbFit4)
 vi$importance
 xgbFit4
 plot(xgbFit4)
@@ -267,7 +289,7 @@ plot(xgbFit4)
 ```{r}
 xgb.pdp4 = list()
 res.partialplot4 = list()
-predvarls4 = list("obesitya", "unemploymenta", "somecollegea", "inactivityb", "childpovertya", "highschoolb", "inactivitya", "childpovertyb", "highschoola", "somecollegeb")
+predvarls4 = list("somecollegea", "childpovertya", "uninsureda", "highschoola", "unemploymenta", "inactivitya", "childpovertyb", "highschoolb", "obesityb", "obesitya")
 summary(fairpooranalytic$fairpoordif)
 
 for (m in 1:length(predvarls4)){
@@ -282,7 +304,14 @@ xgb.pdp4[[m]] =
 res.partialplot4[[m]] = plotPartial(xgb.pdp4[[m]], rug =TRUE, train = training)
 }
 
-for (i in 1:10){
-  res.partialplot4[[i]]
-}
+res.partialplot4[[1]]
+res.partialplot4[[2]]
+res.partialplot4[[3]]
+res.partialplot4[[4]]
+res.partialplot4[[5]]
+res.partialplot4[[6]]
+res.partialplot4[[7]]
+res.partialplot4[[8]]
+res.partialplot4[[9]]
+res.partialplot4[[10]]
 ```
