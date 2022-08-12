@@ -21,16 +21,27 @@ agelims = range(age)
 age.grid = seq(from = agelims [1], to = agelims [2])
 preds = predict(fit , newdata= list(age= age.grid),se= TRUE)
 se.bands = cbind(preds$fit + 2 * preds$se.fit , preds$fit - 2* preds$se.fit)
+par(mfrow = c(1, 2), mar = c(4.5 , 4.5, 1, 1),oma = c(0, 0, 4, 0))
+plot(age , wage , xlim = agelims , cex = .5, col = " darkgrey" )
+title(" Degree -4 Polynomial " , outer = T)
+lines(age.grid , preds$fit , lwd = 2, col = " blue" )
+matlines (age.grid , se.bands , lwd = 1, col = " blue" , lty = 3)
+preds2 = predict(fit2 , newdata = list(age = age.grid), se = TRUE)
+max(abs(preds$fit - preds2$fit))
 
-
-
-fit= lm(wage ~ bs(age, knots = c(25,40,60)), data = Wage)
-pred = predict(fit , newdata = list(age = age.grid), se= T)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+```{r}
+fit= lm(wage ~ bs(age, knots = c(25,40,60)), data = Wage)
+pred = predict(fit , newdata = list(age = age.grid), se= T)
+plot(age , wage , col = " gray" )
+lines(age.grid , pred$fit , lwd = 2)
+lines(age.grid , pred$fit + 2 * pred$se, lty = " dashed" )
+lines(age.grid , pred$fit - 2 * pred$se, lty = " dashed" )
+```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+
 
