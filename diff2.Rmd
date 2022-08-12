@@ -100,7 +100,7 @@ data = YPLLanalytic
 grid = expand.grid( degree = 1:4, nprune = seq(5, 50, by = 5)  )
 
 result = caret::train( YPLLdif ~., data
-                    , method = 'earth'
+                    , method = 'bagEarth'
                     , tuneGrid = grid
                     , trControl = caret::trainControl( method = 'cv'
                                           , verboseIter = F
