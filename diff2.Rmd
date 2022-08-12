@@ -82,6 +82,49 @@ res.partialplot[[9]]
 res.partialplot[[10]]
 ```
 
+```{r}
+library(caret)
+library(parallel)
+library(tidyverse)
+library(doParallel)
+rm(list = ls())
+set.seed (1)
+load("analytic3.RData")
+YPLLanalytic=analytic3[-c(2,3,4)]
+nc = parallel::detectCores()  
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+data = YPLLanalytic
+
+grid = expand.grid( degree = 1:4, nprune = seq(5, 50, by = 5)  )
+
+result = caret::train( YPLLdif ~., data
+                    , method = 'earth'
+                    , tuneGrid = grid
+                    , trControl = caret::trainControl( method = 'cv'
+                                          , verboseIter = F
+                                          , savePredictions = T
+                                          , allowParallel = T
+                                          )
+                    )
+
+result$finalModel$coefficients %>%
+  as.data.frame() %>%
+  mutate( parameter = row.names(.)) %>%
+  select( parameter, coef = y ) %>%
+  knitr::kable( align = c('lc'), digits = 2 )
+
+result$finalModel
+summary(result$finalModel)
+ggplot(result)
+plot(result$finalModel)
+plot(result$finalModel$coefficients)
+
+```
+
+
+
 # mental
 ```{r}
 library(caret)
