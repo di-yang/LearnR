@@ -46,7 +46,6 @@ tbl.2 = tbl.1 %>% mutate(hospdead = factor(hospdead,levels = c("0","1"),labels =
   mutate(resp = as.double(resp)) %>%
   mutate(sod = as.double(sod)) %>%
   mutate(age = as.double(age)) %>%
-  mutate(dzgroup = as.double(dzgroup)) %>%
   mutate(meanbp = as.double(meanbp)) %>%
   mutate(wblc = as.double(wblc)) %>%
   mutate(hrt = as.double(hrt)) %>%
