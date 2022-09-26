@@ -1,0 +1,107 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(plyr)
+library(gtsummary)
+library(writexl)
+rm(list = ls())
+load("analytic3.RData")
+table1=analytic3 %>% tbl_summary(statistic = all_continuous() ~ "{mean} {min} {max} {sd}") %>% as_tibble()
+writexl::write_xlsx(table1, "table1.xlsx")
+```
+
+```{r}
+library(viridis)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(rjson)
+url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
+counties = rjson::fromJSON(file=url)
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+load("analytic.RData")
+mapdata=analytic %>% pivot_longer(cols = !FIPS, names_to = c("varnam", "year"), names_sep = "_", values_to = "value")
+```
+
+```{r}
+measurelist = list("unemploymentrate",
+            "uninsuredrate",
+            "childpoverty",
+            "YPLLRate",
+            "FairPoor",
+            "PhysicallyUnhealthyDays",
+            "MentallyUnhealthyDays",
+            "PCPRate",
+            "obesity",
+            "inactivity",
+            "somecollege",
+            "highschool"
+            )
+
+mapnamelist = list("Unemployment rate: percent of population age 16+ unemployed and looking for work",
+                   "Uninsured rate: percent of population < 65 without insurance",
+                   "Child poverty rate: percent of children (under age 18) living in poverty",
+                   "Years of Potential Life Lost Rate",
+                   "Percentage of adults that report fair or poor health",
+                   "Average number of reported physically unhealthy days per month",
+                   "Average number of reported mentally unhealthy days per month",
+                   "Primary care physicians (PCP) rate: (Number of PCP/population)*100,000",
+                   "Obesity rate: percent of adults that report BMI >= 30",
+                   "Physical inactivity: Percent of adults that report no leisure time physical activity",
+                   "Some college: percent adults age 25-44 with some post-secondary education",
+                   "High school graduation rate (cohort or averaged freshman)"
+            )
+
+filenamelist = list("unemploymentrate",
+                    "uninsuredrate",
+                    "childpoverty",
+                    "YPLLRate",
+                    "FairPoor",
+                    "PhysicallyUnhealthyDays",
+                    "MentallyUnhealthyDays",
+                    "PCPRate",
+                    "obesity",
+                    "inactivity",
+                    "somecollege",
+                    "highschool"
+                    )
+
+call.map = function(measurevar, mapnamestr){
+  mapdata2=mapdata %>% filter(mapdata$varnam==measurevar)
+  ma=max(mapdata2$value, na.rm = TRUE)
+  mi=min(mapdata2$value, na.rm = TRUE)
+  plotmap1 = plot_ly(geojson=counties, locations=mapdata2$FIPS, z=mapdata2$value, colorscale="Viridis", zmin=mi, zmax=ma, frame=mapdata2$year, type='choropleth')
+  plotmap2=plotmap1 %>%
+  layout(title=mapnamestr,
+         geo = g) %>% 
+  animation_opts(
+    frame = 100, 
+    transition = 0, 
+    redraw = TRUE) %>%
+  animation_slider(
+    currentvalue=list(prefix="year")) %>%
+  animation_button(
+    x = 1, xanchor = "right", y = 0, yanchor = "bottom")
+library(htmlwidgets)
+saveWidget(plotmap2, paste(measurevar, ".html", sep = ""), selfcontained = F, libdir = "lib")
+return()
+}
+
+res.list_map = mapply(call.map, measurelist, mapnamelist)
+
+```
+ 
