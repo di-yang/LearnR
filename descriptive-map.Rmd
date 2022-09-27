@@ -25,6 +25,7 @@ library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(rjson)
+rm(list = ls())
 url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
 counties = rjson::fromJSON(file=url)
 g <- list(
@@ -33,64 +34,6 @@ g <- list(
   showlakes = TRUE,
   lakecolor = toRGB('white')
 )
-```
-
-```{r}
-library(viridis)
-library(tidyverse)
-library(usmap)
-library(ggplot2)
-library(plotly)
-library(rjson)
-rm(list = ls())
-load("analytic3FIPS.RData")
-mapdata=analytic3[-c(2:5)]
-mapdata=mapdata %>% rename(fips=FIPS)
-measurelist = list("unemploymenta",
-            "uninsureda",
-            "childpovertya",
-            "PCPRatea",
-            "obesitya",
-            "inactivitya",
-            "somecollegea",
-            "highschoola",
-            "unemploymentb",
-            "uninsuredb",
-            "childpovertyb",
-            "PCPRateb",
-            "obesityb",
-            "inactivityb",
-            "somecollegeb",
-            "highschoolb"
-            )
-mapnamelist = list("Unemployment rate: percent of population age 16+ unemployed and looking for work, intercept",
-                   "Uninsured rate: percent of population < 65 without insurance, intercept",
-                   "Child poverty rate: percent of children (under age 18) living in poverty, intercept",
-                   "Primary care physicians (PCP) rate: (Number of PCP/population)*100,000, intercept",
-                   "Obesity rate: percent of adults that report BMI >= 30, intercept",
-                   "Physical inactivity: Percent of adults that report no leisure time physical activity, intercept",
-                   "Some college: percent adults age 25-44 with some post-secondary education, intercept",
-                   "High school graduation rate (cohort or averaged freshman), intercept",
-                   "Unemployment rate: percent of population age 16+ unemployed and looking for work, slope",
-                   "Uninsured rate: percent of population < 65 without insurance, slope",
-                   "Child poverty rate: percent of children (under age 18) living in poverty, slope",
-                   "Primary care physicians (PCP) rate: (Number of PCP/population)*100,000, slope",
-                   "Obesity rate: percent of adults that report BMI >= 30, slope",
-                   "Physical inactivity: Percent of adults that report no leisure time physical activity, slope",
-                   "Some college: percent adults age 25-44 with some post-secondary education, slope",
-                   "High school graduation rate (cohort or averaged freshman), slope"
-            )
-
-us_states = map_data("state")
-us_counties = map_data("county")
-call.map = function(measurevar, mapname){
-mapplot=plot_usmap(data=mapdata, values=measurevar) +labs(title = mapname) +scale_fill_continuous(name = "", label = scales::comma)
-ggsave(paste(measurevar, ".png", sep = ""), 
-       plot = mapplot,
-       device = NULL,
-       path = getwd() )
-}
-res.list_map = mapply(call.map, measurelist, mapnamelist)
 ```
 
 
@@ -150,4 +93,62 @@ return()
 res.list_map = mapply(call.map, measurelist, mapnamelist)
 
 ```
- 
+
+
+```{r}
+library(viridis)
+library(tidyverse)
+library(usmap)
+library(ggplot2)
+library(plotly)
+library(rjson)
+rm(list = ls())
+load("analytic3FIPS.RData")
+mapdata=analytic3[-c(2:5)]
+mapdata=mapdata %>% rename(fips=FIPS)
+measurelist = list("unemploymenta",
+            "uninsureda",
+            "childpovertya",
+            "PCPRatea",
+            "obesitya",
+            "inactivitya",
+            "somecollegea",
+            "highschoola",
+            "unemploymentb",
+            "uninsuredb",
+            "childpovertyb",
+            "PCPRateb",
+            "obesityb",
+            "inactivityb",
+            "somecollegeb",
+            "highschoolb"
+            )
+mapnamelist = list("Unemployment rate: percent of population age 16+ unemployed and looking for work, intercept",
+                   "Uninsured rate: percent of population < 65 without insurance, intercept",
+                   "Child poverty rate: percent of children (under age 18) living in poverty, intercept",
+                   "Primary care physicians (PCP) rate: (Number of PCP/population)*100,000, intercept",
+                   "Obesity rate: percent of adults that report BMI >= 30, intercept",
+                   "Physical inactivity: Percent of adults that report no leisure time physical activity, intercept",
+                   "Some college: percent adults age 25-44 with some post-secondary education, intercept",
+                   "High school graduation rate (cohort or averaged freshman), intercept",
+                   "Unemployment rate: percent of population age 16+ unemployed and looking for work, slope",
+                   "Uninsured rate: percent of population < 65 without insurance, slope",
+                   "Child poverty rate: percent of children (under age 18) living in poverty, slope",
+                   "Primary care physicians (PCP) rate: (Number of PCP/population)*100,000, slope",
+                   "Obesity rate: percent of adults that report BMI >= 30, slope",
+                   "Physical inactivity: Percent of adults that report no leisure time physical activity, slope",
+                   "Some college: percent adults age 25-44 with some post-secondary education, slope",
+                   "High school graduation rate (cohort or averaged freshman), slope"
+            )
+
+us_states = map_data("state")
+us_counties = map_data("county")
+call.map = function(measurevar, mapname){
+mapplot=plot_usmap(data=mapdata, values=measurevar) +labs(title = mapname) + scale_fill_continuous(type='viridis', name = "", label = scales::comma)
+ggsave(paste(measurevar, ".png", sep = ""), 
+       plot = mapplot,
+       device = NULL,
+       path = getwd() )
+}
+res.list_map = mapply(call.map, measurelist, mapnamelist)
+```
