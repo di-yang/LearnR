@@ -45,6 +45,8 @@ RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
 
 
 ```{r}
+RMD$year=as.integer(RMD$year)
+RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
 RMD=RMD %>% drop_na(FIPS)
 RMDwide= pivot_wider(RMD, id_cols = FIPS,  names_from = year, values_from = c(YPLLRate, FairPoor, PhysicallyUnhealthyDays, MentallyUnhealthyDays, PCPRate, obesity, PM25, inactivity, somecollege, highschool))
 longdata = read_csv("./chr_trends_csv_2021.csv")
