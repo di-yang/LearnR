@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
@@ -19,15 +21,17 @@ tomerge=disparity[c(7:9)]
 load("analytic3FIPS.RData")
 analyticwrace=merge(analytic3, tomerge, by.x="FIPS", by.y="FIPS")
 analyticwrace = na.omit(analyticwrace)
+analyticwrace = analyticwrace[-1]
 ```
-
+#YPLL
 ```{r}
 library(caret)
 library(xgboost)
 library(plyr)
 library(doParallel)
 library(pdp)
-YPLLanalytic=analytic3[-c(2,3,4)]
+set.seed (1)
+YPLLanalytic=analyticwrace[-c(2,3,4)]
 nc = parallel::detectCores()  
 cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
 registerDoParallel(cl)        #Set up parallel
@@ -65,9 +69,262 @@ xgbFit1
 plot(xgbFit1)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+```{r}
+xgb.pdp = list()
+res.partialplot = list()
+predvarls = list("obesitya", "somecollegea", "unemploymentb", "unemploymenta",  "inactivitya", "PCPRatea", "highschoola", "hpnon", "inactivityb", "obesityb")
+summary(YPLLanalytic$YPLLdif)
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+for (m in 1:length(predvarls)){
+xgb.pdp[[m]] = 
+  partial(
+    object = xgbFit1,
+    pred.var = predvarls[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = training)
+}
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+res.partialplot[[1]]
+res.partialplot[[2]]
+res.partialplot[[3]]
+res.partialplot[[4]]
+res.partialplot[[5]]
+res.partialplot[[6]]
+res.partialplot[[7]]
+res.partialplot[[8]]
+res.partialplot[[9]]
+res.partialplot[[10]]
+```
+
+# mental
+```{r}
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+set.seed (1)
+mentalanalytic=analyticwrace[-c(1,3,4)]
+nc = parallel::detectCores()  
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(mentalanalytic$mentaldif, p = .75, list = FALSE)
+training = mentalanalytic[ inTraining,]
+testing  = mentalanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+
+xgbGrid2 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+                       max_depth = c(1, 2, 3), #2, 4, 6
+                       eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
+                       gamma = 0,
+                       colsample_bytree = c(0.8, 0.9, 1), #6, 7, 8
+                       min_child_weight = 20,
+                       subsample = c(0.8, 0.9, 1 )) #0.9, 1
+
+xgbFit2 = train(mentaldif ~ ., data = training,
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid2,
+                nthread=1,
+                verbosity = 0
+                )
+
+stopCluster(cl)
+plot(varImp(xgbFit2)) 
+vi=varImp(xgbFit2)
+vi$importance
+xgbFit2
+plot(xgbFit2)
+```
+
+```{r}
+xgb.pdp2 = list()
+res.partialplot2 = list()
+predvarls2 = list("obesitya", "inactivitya", "unemploymenta", "highschoolb", "somecollegea", "unemploymentb", "somecollegeb", "blwt", "highschoola", "childpovertya")
+summary(mentalanalytic$mentaldif)
+
+for (m in 1:length(predvarls2)){
+xgb.pdp2[[m]] = 
+  partial(
+    object = xgbFit2,
+    pred.var = predvarls2[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot2[[m]] = plotPartial(xgb.pdp2[[m]], rug =TRUE, train = training)
+}
+
+res.partialplot2[[1]]
+res.partialplot2[[2]]
+res.partialplot2[[3]]
+res.partialplot2[[4]]
+res.partialplot2[[5]]
+res.partialplot2[[6]]
+res.partialplot2[[7]]
+res.partialplot2[[8]]
+res.partialplot2[[9]]
+res.partialplot2[[10]]
+```
+
+# physical
+```{r}
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+set.seed (1)
+physicalanalytic=analyticwrace[-c(1,2,4)]
+nc = parallel::detectCores()  
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(physicalanalytic$physicaldif, p = .75, list = FALSE)
+training = physicalanalytic[ inTraining,]
+testing  = physicalanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+
+xgbGrid3 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+                       max_depth = c(1, 2, 3), #2, 4, 6
+                       eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
+                       gamma = 0,
+                       colsample_bytree = c(0.8, 0.9, 1), #6, 7, 8
+                       min_child_weight = 20,
+                       subsample = c(0.8, 0.9, 1 )) #0.9, 1
+
+xgbFit3 = train(physicaldif ~ ., data = training,
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid3,
+                nthread=1,
+                verbosity = 0
+                )
+
+stopCluster(cl)
+plot(varImp(xgbFit3)) 
+vi=varImp(xgbFit3) 
+vi$importance
+xgbFit3
+plot(xgbFit3)
+```
+
+```{r}
+xgb.pdp3 = list()
+res.partialplot3 = list()
+predvarls3 = list("somecollegea", "childpovertya", "highschoolb", "highschoola", "blwt", "inactivitya", "uninsureda", "hpnon", "unemploymenta", "childpovertyb")
+summary(physicalanalytic$physicaldif)
+
+for (m in 1:length(predvarls3)){
+xgb.pdp3[[m]] = 
+  partial(
+    object = xgbFit3,
+    pred.var = predvarls3[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot3[[m]] = plotPartial(xgb.pdp3[[m]], rug =TRUE, train = training)
+}
+
+res.partialplot3[[1]]
+res.partialplot3[[2]]
+res.partialplot3[[3]]
+res.partialplot3[[4]]
+res.partialplot3[[5]]
+res.partialplot3[[6]]
+res.partialplot3[[7]]
+res.partialplot3[[8]]
+res.partialplot3[[9]]
+res.partialplot3[[10]]
+```
+
+# fairpoor
+```{r}
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+set.seed (1)
+fairpooranalytic=analyticwrace[-c(1,2,3)]
+nc = parallel::detectCores()  
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+inTraining = createDataPartition(fairpooranalytic$fairpoordif, p = .75, list = FALSE)
+training = fairpooranalytic[ inTraining,]
+testing  = fairpooranalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+
+xgbGrid4 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+                       max_depth = c(1, 2, 3), #2, 4, 6
+                       eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
+                       gamma = 0,
+                       colsample_bytree = c(0.8, 0.9, 1), #6, 7, 8
+                       min_child_weight = 20,
+                       subsample = c(0.8, 0.9, 1 )) #0.9, 1
+
+xgbFit4 = train(fairpoordif ~ ., data = training,
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid4,
+                nthread=1,
+                verbosity = 0
+                )
+
+stopCluster(cl)
+plot(varImp(xgbFit4))
+vi=varImp(xgbFit4)
+vi$importance
+xgbFit4
+plot(xgbFit4)
+```
+
+```{r}
+xgb.pdp4 = list()
+res.partialplot4 = list()
+predvarls4 = list("somecollegea", "childpovertya", "uninsureda", "unemploymenta", "inactivitya", "blwt", "childpovertyb", "hpnon", "highschoola", "obesityb")
+summary(fairpooranalytic$fairpoordif)
+
+for (m in 1:length(predvarls4)){
+xgb.pdp4[[m]] = 
+  partial(
+    object = xgbFit4,
+    pred.var = predvarls4[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot4[[m]] = plotPartial(xgb.pdp4[[m]], rug =TRUE, train = training)
+}
+
+res.partialplot4[[1]]
+res.partialplot4[[2]]
+res.partialplot4[[3]]
+res.partialplot4[[4]]
+res.partialplot4[[5]]
+res.partialplot4[[6]]
+res.partialplot4[[7]]
+res.partialplot4[[8]]
+res.partialplot4[[9]]
+res.partialplot4[[10]]
+```
+
 
