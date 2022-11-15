@@ -99,10 +99,13 @@ library(plyr)
 library(doParallel)
 library(pdp)
 set.seed (1)
-YPLLanalytic=analyticwrace[-c(2,3,4)]
+YPLLanalytic=analyticwrace[-c(2,3,4,23)]
+
+
 nc = parallel::detectCores()  
 cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
 registerDoParallel(cl)        #Set up parallel
+
 
 inTraining = createDataPartition(YPLLanalytic$YPLLdif, p = .75, list = FALSE)
 training = YPLLanalytic[ inTraining,]
@@ -113,19 +116,27 @@ fitControl = trainControl(method = "repeatedcv",
                           allowParallel=TRUE
                           )
 
-xgbGrid1 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
-                       max_depth = c(1, 2, 3), #2, 4, 6
-                       eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
+# xgbGrid1 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+#                        max_depth = c(1, 2, 3), #2, 4, 6
+#                        eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
+#                        gamma = 0,
+#                        colsample_bytree = c(0.8, 0.9, 1), #6, 7, 8
+#                        min_child_weight = 20,
+#                        subsample = c(0.8, 0.9, 1 )) #0.9, 1
+
+xgbGrid1 = expand.grid(nrounds = c(200),
+                       max_depth = c(2, 3), #2, 4, 6
+                       eta = c(0.01),  # 0.05, 0.075
                        gamma = 0,
-                       colsample_bytree = c(0.8, 0.9, 1), #6, 7, 8
+                       colsample_bytree = c(0.9, 1), #6, 7, 8
                        min_child_weight = 20,
-                       subsample = c(0.8, 0.9, 1 )) #0.9, 1
+                       subsample = c(0.9, 1 )) #0.9, 1
 
 xgbFit1 = train(YPLLdif ~ ., data = training,
                  method = "xgbTree", 
                  trControl = fitControl,
                  tuneGrid = xgbGrid1,
-                weights = averweight,
+                weights = analyticwrace$averweight[inTraining],
                 nthread=1,
                 verbosity = 0
                 )
