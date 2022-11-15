@@ -51,7 +51,7 @@ sum(RMDwide$weight19, na.rm = TRUE)
 
 weight=RMDwide[c(1, 14, 17, 20, 23, 26)]
 weight[is.na(weight)] = 0
-weight$averweight=(weight$weight15 + weight$weight16 + weight$weight17 + weight$weight18 + weight$weight19)/5
+weight$averweight=dim(weight)[1]*(weight$weight15 + weight$weight16 + weight$weight17 + weight$weight18 + weight$weight19)/5
 weight=weight[c(1, 7)]
 save(weight, file = "weight.RData")
 
@@ -64,7 +64,7 @@ analyticnweight=analyticnweight[-c(1)]
 library(tidyverse)
 library(readxl)
 library(corrplot)
-#library(weights)
+library(weights)
 rm(list = ls())
 disparity=read_csv("./race.csv", col_types = "ccdddd")
 disparity$FIPS=substr(disparity$GEO_ID, 10, 14)
@@ -78,10 +78,12 @@ analyticwrace=merge(analyticwrace, weight, by.x="FIPS", by.y="FIPS")
 analyticwrace = na.omit(analyticwrace)
 analyticwrace = analyticwrace[-1]
 
-#tocor=analyticwrace[-c(23)]
-#weightonly=weight[c(1)]
-#Mw=wtd.cor(tocor, weight = weightonly)
-#corrplot(Mw, method = 'color', order = 'alphabet')
+tocor=analyticwrace[-c(23)]
+weightonly=analyticwrace[c(23)]
+tocor=as.matrix(tocor)
+
+Mw=wtd.cor(tocor, weight = weightonly$averweight)
+corrplot(Mw$correlation, method = 'color', order = 'alphabet')
 
 #M = cor(analyticwrace)
 #corrplot(M, method = 'number')
