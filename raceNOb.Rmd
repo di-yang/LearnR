@@ -5,7 +5,7 @@ output:
     df_print: paged
 ---
 
-```{r eval=FALSE}
+```{r}
 library(tidyverse)
 library(readxl)
 library(corrplot)

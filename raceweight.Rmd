@@ -64,7 +64,7 @@ analyticnweight=analyticnweight[-c(1)]
 library(tidyverse)
 library(readxl)
 library(corrplot)
-library(weights)
+#library(weights)
 rm(list = ls())
 disparity=read_csv("./race.csv", col_types = "ccdddd")
 disparity$FIPS=substr(disparity$GEO_ID, 10, 14)
