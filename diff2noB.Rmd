@@ -53,7 +53,7 @@ xgbFit1
 plot(xgbFit1)
 ```
 
-```{r}
+```{r eval = FALSE}
 xgb.pdp = list()
 res.partialplot = list()
 predvarls = list("obesitya", "inactivitya", "unemploymenta", "somecollegea", "highschoola", "inactivityb", "childpovertya", "somecollegeb", "PCPRatea", "unemploymentb")
@@ -83,7 +83,7 @@ res.partialplot[[9]]
 res.partialplot[[10]]
 ```
 
-```{r}
+```{r eval = FALSE}
 library(caret)
 library(parallel)
 library(tidyverse)
@@ -174,7 +174,7 @@ xgbFit2
 plot(xgbFit2)
 ```
 
-```{r}
+```{r eval = FALSE}
 xgb.pdp2 = list()
 res.partialplot2 = list()
 predvarls2 = list("inactivitya", "somecollegea", "obesitya", "uninsuredb", "highschoolb", "unemploymenta", "somecollegeb", "childpovertya", "uninsureda", "highschoola")
@@ -252,7 +252,7 @@ xgbFit3
 plot(xgbFit3)
 ```
 
-```{r}
+```{r eval = FALSE}
 xgb.pdp3 = list()
 res.partialplot3 = list()
 predvarls3 = list("somecollegea", "uninsureda", "childpovertya", "inactivitya", "highschoolb", "highschoola", "PCPRatea", "childpovertyb", "unemploymenta", "inactivityb")
@@ -330,7 +330,7 @@ xgbFit4
 plot(xgbFit4)
 ```
 
-```{r}
+```{r eval = FALSE}
 xgb.pdp4 = list()
 res.partialplot4 = list()
 predvarls4 = list("somecollegea", "childpovertya", "uninsureda", "highschoola", "unemploymenta", "inactivitya", "childpovertyb", "highschoolb", "obesityb", "obesitya")
