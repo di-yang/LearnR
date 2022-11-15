@@ -1,0 +1,29 @@
+---
+title: "corrplot"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(corrplot)
+rm(list = ls())
+disparity=read_csv("./race.csv", col_types = "ccdddd")
+disparity$FIPS=substr(disparity$GEO_ID, 10, 14)
+disparity$blwt=disparity$S1701_C03_010E - disparity$S1701_C03_009E
+disparity$hpnon=disparity$S1701_C03_016E - disparity$S1701_C03_017E
+tomerge=disparity[c(7:9)]
+load("analytic3FIPS.RData")
+analyticwrace=merge(analytic3, tomerge, by.x="FIPS", by.y="FIPS")
+analyticwrace = na.omit(analyticwrace)
+analyticwrace = analyticwrace[-1]
+
+M = cor(analyticwrace)
+corrplot(M, method = 'number')
+corrplot(M, method = 'color', order = 'alphabet')
+corrplot(M)
+```
+
