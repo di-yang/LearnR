@@ -47,7 +47,7 @@ fitControl = trainControl(method = "repeatedcv",
                           allowParallel=TRUE
                           )
 
-xgbGrid1 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+xgbGrid1 = expand.grid(nrounds = c(50, 100, 200), #200, 300
                        max_depth = c(1, 2, 3), #2, 4, 6
                        eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
                        gamma = 0,
@@ -123,7 +123,7 @@ fitControl = trainControl(method = "repeatedcv",
                           allowParallel=TRUE
                           )
 
-xgbGrid2 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+xgbGrid2 = expand.grid(nrounds = c(50, 100, 200), #200, 300
                        max_depth = c(1, 2, 3), #2, 4, 6
                        eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
                        gamma = 0,
@@ -199,7 +199,7 @@ fitControl = trainControl(method = "repeatedcv",
                           allowParallel=TRUE
                           )
 
-xgbGrid3 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+xgbGrid3 = expand.grid(nrounds = c( 50, 100, 200), #200, 300
                        max_depth = c(1, 2, 3), #2, 4, 6
                        eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
                        gamma = 0,
@@ -275,7 +275,7 @@ fitControl = trainControl(method = "repeatedcv",
                           allowParallel=TRUE
                           )
 
-xgbGrid4 = expand.grid(nrounds = c(25, 50, 100, 200), #200, 300
+xgbGrid4 = expand.grid(nrounds = c(50, 100, 200), #200, 300
                        max_depth = c(1, 2, 3), #2, 4, 6
                        eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
                        gamma = 0,
