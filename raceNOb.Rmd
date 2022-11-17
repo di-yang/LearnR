@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Result without weight, control for racial disparity, droped slope for highschool, PCP, unemployment"
 output:
   html_document:
     df_print: paged
@@ -25,7 +25,9 @@ corrplot(M, method = 'number')
 corrplot(M, method = 'color', order = 'alphabet')
 corrplot(M)
 ```
-#YPLL
+
+# YPLL
+
 ```{r}
 library(caret)
 library(xgboost)
@@ -71,10 +73,10 @@ xgbFit1
 plot(xgbFit1)
 ```
 
-```{r eval = FALSE}
+```{r}
 xgb.pdp = list()
 res.partialplot = list()
-predvarls = list("obesitya", "somecollegea", "unemploymentb", "unemploymenta",  "inactivitya", "PCPRatea", "highschoola", "hpnon", "inactivityb", "obesityb")
+predvarls = list("obesitya", "unemploymenta", "somecollegea", "hpnon",  "inactivitya", "PCPRatea", "uninsureda", "highschoola", "obesityb", "childpovertya")
 summary(YPLLanalytic$YPLLdif)
 
 for (m in 1:length(predvarls)){
@@ -147,10 +149,10 @@ xgbFit2
 plot(xgbFit2)
 ```
 
-```{r eval = FALSE}
+```{r}
 xgb.pdp2 = list()
 res.partialplot2 = list()
-predvarls2 = list("obesitya", "inactivitya", "unemploymenta", "highschoolb", "somecollegea", "unemploymentb", "somecollegeb", "blwt", "highschoola", "childpovertya")
+predvarls2 = list("unemploymenta", "somecollegeb", "obesitya", "highschoola", "inactivitya", "blwt", "somecollegea", "childpovertya", "uninsuredb", "uninsureda")
 summary(mentalanalytic$mentaldif)
 
 for (m in 1:length(predvarls2)){
@@ -223,10 +225,10 @@ xgbFit3
 plot(xgbFit3)
 ```
 
-```{r eval = FALSE}
+```{r}
 xgb.pdp3 = list()
 res.partialplot3 = list()
-predvarls3 = list("somecollegea", "childpovertya", "highschoolb", "highschoola", "blwt", "inactivitya", "uninsureda", "hpnon", "unemploymenta", "childpovertyb")
+predvarls3 = list("somecollegea", "highschoola", "blwt", "childpovertya", "uninsureda", "inactivitya", "hpnon", "unemploymenta", "childpovertyb", "obesityb")
 summary(physicalanalytic$physicaldif)
 
 for (m in 1:length(predvarls3)){
@@ -299,10 +301,10 @@ xgbFit4
 plot(xgbFit4)
 ```
 
-```{r eval = FALSE}
+```{r }
 xgb.pdp4 = list()
 res.partialplot4 = list()
-predvarls4 = list("somecollegea", "childpovertya", "uninsureda", "unemploymenta", "inactivitya", "blwt", "childpovertyb", "hpnon", "highschoola", "obesityb")
+predvarls4 = list("somecollegea", "childpovertya", "unemploymenta", "uninsureda", "blwt", "inactivitya", "highschoola", "childpovertyb", "hpnon", "obesitya")
 summary(fairpooranalytic$fairpoordif)
 
 for (m in 1:length(predvarls4)){

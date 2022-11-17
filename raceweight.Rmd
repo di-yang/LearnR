@@ -1,5 +1,5 @@
 ---
-title: "result with weight"
+title: "Result without weight, control for racial disparity, droped slope for highschool, PCP, unemployment"
 output:
   html_document:
     df_print: paged
@@ -91,7 +91,8 @@ corrplot(Mw$correlation, method = 'color', order = 'alphabet')
 #corrplot(M)
 ```
 
-#YPLL
+# YPLL
+
 ```{r}
 library(caret)
 library(xgboost)
@@ -141,10 +142,10 @@ xgbFit1
 plot(xgbFit1)
 ```
 
-```{r eval=FALSE}
+```{r }
 xgb.pdp = list()
 res.partialplot = list()
-predvarls = list("obesitya", "somecollegea", "unemploymentb", "unemploymenta",  "inactivitya", "PCPRatea", "highschoola", "hpnon", "inactivityb", "obesityb")
+predvarls = list("somecollegea", "obesitya", "inactivitya", "uninsureda",  "unemploymenta", "blwt", "highschoola", "inactivityb", "obesityb", "highschoolb")
 summary(YPLLanalytic$YPLLdif)
 
 for (m in 1:length(predvarls)){
@@ -218,10 +219,10 @@ xgbFit2
 plot(xgbFit2)
 ```
 
-```{r eval=FALSE}
+```{r }
 xgb.pdp2 = list()
 res.partialplot2 = list()
-predvarls2 = list("obesitya", "inactivitya", "unemploymenta", "highschoolb", "somecollegea", "unemploymentb", "somecollegeb", "blwt", "highschoola", "childpovertya")
+predvarls2 = list("unemploymenta", "highschoolb", "obesitya", "inactivitya", "unemploymentb", "somecollegeb", "hpnon", "blwt", "uninsuredb", "uninsureda")
 summary(mentalanalytic$mentaldif)
 
 for (m in 1:length(predvarls2)){
@@ -296,10 +297,10 @@ xgbFit3
 plot(xgbFit3)
 ```
 
-```{r eval=FALSE}
+```{r }
 xgb.pdp3 = list()
 res.partialplot3 = list()
-predvarls3 = list("somecollegea", "childpovertya", "highschoolb", "highschoola", "blwt", "inactivitya", "uninsureda", "hpnon", "unemploymenta", "childpovertyb")
+predvarls3 = list("somecollegea", "blwt", "inactivitya", "uninsureda", "childpovertya", "highschoolb", "obesityb", "highschoola", "hpnon", "unemploymenta")
 summary(physicalanalytic$physicaldif)
 
 for (m in 1:length(predvarls3)){
@@ -373,10 +374,10 @@ xgbFit4
 plot(xgbFit4)
 ```
 
-```{r eval=FALSE}
+```{r }
 xgb.pdp4 = list()
 res.partialplot4 = list()
-predvarls4 = list("somecollegea", "childpovertya", "uninsureda", "unemploymenta", "inactivitya", "blwt", "childpovertyb", "hpnon", "highschoola", "obesityb")
+predvarls4 = list("somecollegea", "inactivitya", "childpovertya", "uninsureda", "unemploymenta", "unemploymentb", "childpovertyb", "blwt", "inactivityb", "obesityb")
 summary(fairpooranalytic$fairpoordif)
 
 for (m in 1:length(predvarls4)){
