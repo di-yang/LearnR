@@ -3,6 +3,16 @@ title: "Result without weight, control for racial disparity, droped slope for hi
 output:
   html_document:
     df_print: paged
+
+{css, echo=FALSE}
+    body .main-container {
+      max-width: 1280px !important;
+      width: 1280px !important;
+    }
+    body {
+      max-width: 1280px !important;
+    }
+
 ---
 # create weight manually
 ```{r}
