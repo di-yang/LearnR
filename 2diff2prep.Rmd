@@ -213,6 +213,3 @@ names(analytic3)
 save(analytic3, file = "analytic3.RData")
 ```
 
-
-
-

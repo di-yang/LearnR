@@ -4,15 +4,6 @@ output:
   html_document:
     df_print: paged
 
-{css, echo=FALSE}
-    body .main-container {
-      max-width: 1280px !important;
-      width: 1280px !important;
-    }
-    body {
-      max-width: 1280px !important;
-    }
-
 ---
 # create weight manually
 ```{r}
@@ -104,6 +95,9 @@ corrplot(Mw$correlation, method = 'color', order = 'alphabet')
 # YPLL
 
 ```{r}
+options(width = 300)
+matrix(runif(100), ncol = 20)
+
 library(caret)
 library(xgboost)
 library(plyr)
@@ -167,7 +161,7 @@ xgb.pdp[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = training)
+res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(150, 600) )
 }
 
 res.partialplot[[1]]
@@ -184,6 +178,9 @@ res.partialplot[[10]]
 
 # mental
 ```{r}
+options(width = 300)
+matrix(runif(100), ncol = 20)
+
 library(caret)
 library(xgboost)
 library(plyr)
@@ -244,7 +241,7 @@ xgb.pdp2[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot2[[m]] = plotPartial(xgb.pdp2[[m]], rug =TRUE, train = training)
+res.partialplot2[[m]] = plotPartial(xgb.pdp2[[m]], rug =TRUE, train = training, ylim=c(0.1,0.55))
 }
 
 res.partialplot2[[1]]
@@ -261,6 +258,9 @@ res.partialplot2[[10]]
 
 # physical
 ```{r}
+options(width = 300)
+matrix(runif(100), ncol = 20)
+
 library(caret)
 library(xgboost)
 library(plyr)
@@ -322,7 +322,7 @@ xgb.pdp3[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot3[[m]] = plotPartial(xgb.pdp3[[m]], rug =TRUE, train = training)
+res.partialplot3[[m]] = plotPartial(xgb.pdp3[[m]], rug =TRUE, train = training, ylim=c(-0.3, 0.4))
 }
 
 res.partialplot3[[1]]
@@ -339,6 +339,9 @@ res.partialplot3[[10]]
 
 # fairpoor
 ```{r}
+options(width = 300)
+matrix(runif(100), ncol = 20)
+
 library(caret)
 library(xgboost)
 library(plyr)
@@ -399,7 +402,7 @@ xgb.pdp4[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot4[[m]] = plotPartial(xgb.pdp4[[m]], rug =TRUE, train = training)
+res.partialplot4[[m]] = plotPartial(xgb.pdp4[[m]], rug =TRUE, train = training, ylim=c(-2,3) )
 }
 
 res.partialplot4[[1]]

@@ -1,0 +1,177 @@
+---
+title: "Result without weight, control for racial disparity, droped slope for highschool, PCP, unemployment"
+output:
+  html_document:
+    df_print: paged
+---
+
+# create weight manually
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(readxl)
+filenames <- list.files("./Ranked Measure Data2")
+filenames
+RMD <- data.frame(matrix(ncol = 0, nrow = 0))
+for (filename in filenames){  
+   yearnum <- gsub(".xls", "", filename)  
+   RMD = RMD %>% bind_rows(assign(paste0("RMD",yearnum), read_excel(paste0("./Ranked Measure Data2/", filename), sheet="Ranked Measure Data", skip = 1) %>%
+            mutate(year=yearnum) %>% 
+            select(FIPS, year, YPLLRateLow, YPLLRateHigh)))
+}
+
+RMD$year=as.integer(RMD$year)
+RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
+RMD=RMD %>% drop_na(FIPS)
+RMDwide= pivot_wider(RMD, id_cols = FIPS,  names_from = year, values_from = c(YPLLRateLow, YPLLRateHigh))
+
+RMDwide$range15=(RMDwide$YPLLRateHigh_2015 - RMDwide$YPLLRateLow_2015)/(4*1.96)
+RMDwide$irange15=1/RMDwide$range15
+RMDwide$weight15=RMDwide$irange15 / sum(RMDwide$irange15, na.rm = TRUE)
+sum(RMDwide$weight15 , na.rm = TRUE)
+
+RMDwide$range16=(RMDwide$YPLLRateHigh_2016 - RMDwide$YPLLRateLow_2016)/(4*1.96)
+RMDwide$irange16=1/RMDwide$range16
+RMDwide$weight16=RMDwide$irange16 / sum(RMDwide$irange16, na.rm = TRUE)
+sum(RMDwide$weight16, na.rm = TRUE)
+
+RMDwide$range17=(RMDwide$YPLLRateHigh_2017 - RMDwide$YPLLRateLow_2017)/(4*1.96)
+RMDwide$irange17=1/RMDwide$range17
+RMDwide$weight17=RMDwide$irange17 / sum(RMDwide$irange17, na.rm = TRUE)
+sum(RMDwide$weight17, na.rm = TRUE)
+
+RMDwide$range18=(RMDwide$YPLLRateHigh_2018 - RMDwide$YPLLRateLow_2018)/(4*1.96)
+RMDwide$irange18=1/RMDwide$range18
+RMDwide$weight18=RMDwide$irange18 / sum(RMDwide$irange18, na.rm = TRUE)
+sum(RMDwide$weight18, na.rm = TRUE)
+
+RMDwide$range19=(RMDwide$YPLLRateHigh_2019 - RMDwide$YPLLRateLow_2019)/(4*1.96)
+RMDwide$irange19=1/RMDwide$range19
+RMDwide$weight19=RMDwide$irange19 / sum(RMDwide$irange19, na.rm = TRUE)
+sum(RMDwide$weight19, na.rm = TRUE)
+
+weight=RMDwide[c(1, 14, 17, 20, 23, 26)]
+weight[is.na(weight)] = 0
+weight$averweight=dim(weight)[1]*(weight$weight15 + weight$weight16 + weight$weight17 + weight$weight18 + weight$weight19)/5
+weight=weight[c(1, 7)]
+save(weight, file = "weight.RData")
+
+load("analytic3FIPS.RData")
+analyticnweight=merge(analytic3, weight, by.x="FIPS", by.y="FIPS")
+analyticnweight=analyticnweight[-c(1)]
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(corrplot)
+library(weights)
+rm(list = ls())
+disparity=read_csv("./race.csv", col_types = "ccdddd")
+disparity$FIPS=substr(disparity$GEO_ID, 10, 14)
+disparity$blwt=disparity$S1701_C03_010E - disparity$S1701_C03_009E
+disparity$hpnon=disparity$S1701_C03_016E - disparity$S1701_C03_017E
+tomerge=disparity[c(7:9)]
+load("analytic3FIPS.RData")
+analyticwrace=merge(analytic3, tomerge, by.x="FIPS", by.y="FIPS")
+load("weight.RData")
+analyticwrace=merge(analyticwrace, weight, by.x="FIPS", by.y="FIPS")
+analyticwrace = na.omit(analyticwrace)
+analyticwrace = analyticwrace[-1]
+
+tocor=analyticwrace[-c(23)]
+weightonly=analyticwrace[c(23)]
+tocor=as.matrix(tocor)
+
+Mw=wtd.cor(tocor, weight = weightonly$averweight)
+corrplot(Mw$correlation, method = 'color', order = 'alphabet')
+
+#M = cor(analyticwrace)
+#corrplot(M, method = 'number')
+#corrplot(M, method = 'color', order = 'alphabet')
+#corrplot(M)
+```
+
+# YPLL
+
+```{r}
+options(width = 300)
+matrix(runif(100), ncol = 20)
+
+library(caret)
+library(xgboost)
+library(plyr)
+library(doParallel)
+library(pdp)
+set.seed (1)
+YPLLanalytic=analyticwrace[-c(2,3,4,23)]
+
+
+nc = parallel::detectCores()  
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+
+inTraining = createDataPartition(YPLLanalytic$YPLLdif, p = .75, list = FALSE)
+training = YPLLanalytic[ inTraining,]
+testing  = YPLLanalytic[-inTraining,]
+fitControl = trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 10,
+                          allowParallel=TRUE
+                          )
+
+xgbGrid1 = expand.grid(nrounds = c(50, 100, 200), #200, 300
+                       max_depth = c(1, 2, 3), #2, 4, 6
+                       eta = c(0.01, 0.025, 0.05),  # 0.05, 0.075
+                       gamma = 0,
+                       colsample_bytree = c(0.8, 0.9, 1), #6, 7, 8
+                       min_child_weight = 20,
+                       subsample = c(0.8, 0.9, 1 )) #0.9, 1
+
+xgbFit1 = train(YPLLdif ~ ., data = training,
+                 method = "xgbTree", 
+                 trControl = fitControl,
+                 tuneGrid = xgbGrid1,
+                weights = analyticwrace$averweight[inTraining],
+                nthread=1,
+                verbosity = 0
+                )
+
+stopCluster(cl)
+plot(varImp(xgbFit1))
+vi=varImp(xgbFit1)
+vi$importance
+xgbFit1
+plot(xgbFit1)
+```
+
+```{r }
+xgb.pdp = list()
+res.partialplot = list()
+predvarls = list("somecollegea", "obesitya", "inactivitya", "uninsureda",  "unemploymenta", "blwt", "highschoola", "inactivityb", "obesityb", "highschoolb")
+summary(YPLLanalytic$YPLLdif)
+
+for (m in 1:length(predvarls)){
+xgb.pdp[[m]] = 
+  partial(
+    object = xgbFit1,
+    pred.var = predvarls[[m]],
+    plot = FALSE,
+    chull = TRUE,
+    plot.engine = "ggplot2"
+  )
+res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(150, 600) )
+}
+
+res.partialplot[[1]]
+res.partialplot[[2]]
+res.partialplot[[3]]
+res.partialplot[[4]]
+res.partialplot[[5]]
+res.partialplot[[6]]
+res.partialplot[[7]]
+res.partialplot[[8]]
+res.partialplot[[9]]
+res.partialplot[[10]]
+```

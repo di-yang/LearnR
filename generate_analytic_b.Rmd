@@ -1,0 +1,103 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(naniar)
+rm(list = ls())
+set.seed (1)
+load("analytic2.RData")
+
+names(analytic2)
+analyticb=data.frame(analytic2[1])
+
+
+# YPLL
+YPLLanalytic=data.frame(analytic2[1], analytic2[54:58])
+YPLLanalytic=YPLLanalytic %>% pivot_longer(c("YPLLRate_2015", "YPLLRate_2016", "YPLLRate_2017", "YPLLRate_2018", "YPLLRate_2019"), names_to = "year", values_to = "value")
+YPLLanalytic=YPLLanalytic %>% 
+  mutate( year = case_when(
+  year=="YPLLRate_2015" ~ 1,
+  year=="YPLLRate_2016" ~ 2,
+  year=="YPLLRate_2017" ~ 3,
+  year=="YPLLRate_2018" ~ 4,
+  year=="YPLLRate_2019" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+pct_miss(YPLLanalytic)
+analyticb=analyticb %>% mutate(YPLLb=NA)
+for (row in 1:nrow(analyticb)){
+  county = YPLLanalytic %>% filter(YPLLanalytic$FIPS == analyticb[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analyticb[row, "YPLLb"]=res.lm$coefficients["county$year"]
+}
+names(analyticb)
+
+# FairPoor
+FairPooranalytic=data.frame(analytic2[1], analytic2[66:70])
+FairPooranalytic=FairPooranalytic %>% pivot_longer(c("FairPoor_2015", "FairPoor_2016", "FairPoor_2017", "FairPoor_2018", "FairPoor_2019"), names_to = "year", values_to = "value")
+FairPooranalytic=FairPooranalytic %>% 
+  mutate( year = case_when(
+  year=="FairPoor_2015" ~ 1,
+  year=="FairPoor_2016" ~ 2,
+  year=="FairPoor_2017" ~ 3,
+  year=="FairPoor_2018" ~ 4,
+  year=="FairPoor_2019" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+pct_miss(FairPooranalytic)
+analyticb=analyticb %>% mutate(fairpoorb=NA)
+for (row in 1:nrow(analyticb)){
+  county = FairPooranalytic %>% filter(FairPooranalytic$FIPS == analyticb[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analyticb[row, "fairpoorb"]=res.lm$coefficients["county$year"]
+}
+names(analyticb)
+
+
+# PhysicallyUnhealthyDays
+PhysicallyUnhealthyDaysanalytic=data.frame(analytic2[1], analytic2[78:82])
+PhysicallyUnhealthyDaysanalytic=PhysicallyUnhealthyDaysanalytic %>% pivot_longer(c("PhysicallyUnhealthyDays_2015", "PhysicallyUnhealthyDays_2016", "PhysicallyUnhealthyDays_2017", "PhysicallyUnhealthyDays_2018", "PhysicallyUnhealthyDays_2019"), names_to = "year", values_to = "value")
+PhysicallyUnhealthyDaysanalytic=PhysicallyUnhealthyDaysanalytic %>% 
+  mutate( year = case_when(
+  year=="PhysicallyUnhealthyDays_2015" ~ 1,
+  year=="PhysicallyUnhealthyDays_2016" ~ 2,
+  year=="PhysicallyUnhealthyDays_2017" ~ 3,
+  year=="PhysicallyUnhealthyDays_2018" ~ 4,
+  year=="PhysicallyUnhealthyDays_2019" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+pct_miss(PhysicallyUnhealthyDaysanalytic)
+analyticb=analyticb %>% mutate(physicalb=NA)
+for (row in 1:nrow(analyticb)){
+  county = PhysicallyUnhealthyDaysanalytic %>% filter(PhysicallyUnhealthyDaysanalytic$FIPS == analyticb[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analyticb[row, "physicalb"]=res.lm$coefficients["county$year"]
+}
+names(analyticb)
+
+# MentallyUnhealthyDays
+MentallyUnhealthyDaysanalytic=data.frame(analytic2[1], analytic2[90:94])
+MentallyUnhealthyDaysanalytic=MentallyUnhealthyDaysanalytic %>% pivot_longer(c("MentallyUnhealthyDays_2015", "MentallyUnhealthyDays_2016", "MentallyUnhealthyDays_2017", "MentallyUnhealthyDays_2018", "MentallyUnhealthyDays_2019"), names_to = "year", values_to = "value")
+MentallyUnhealthyDaysanalytic=MentallyUnhealthyDaysanalytic %>% 
+  mutate( year = case_when(
+  year=="MentallyUnhealthyDays_2015" ~ 1,
+  year=="MentallyUnhealthyDays_2016" ~ 2,
+  year=="MentallyUnhealthyDays_2017" ~ 3,
+  year=="MentallyUnhealthyDays_2018" ~ 4,
+  year=="MentallyUnhealthyDays_2019" ~ 5,
+  TRUE ~ as.numeric(year)
+))
+pct_miss(MentallyUnhealthyDaysanalytic)
+analyticb=analyticb %>% mutate(mentalb=NA)
+for (row in 1:nrow(analyticb)){
+  county = MentallyUnhealthyDaysanalytic %>% filter(MentallyUnhealthyDaysanalytic$FIPS == analyticb[row, "FIPS"]) 
+  res.lm = lm(county$value ~ county$year, data=county)
+  analyticb[row, "mentalb"]=res.lm$coefficients["county$year"]
+}
+names(analyticb)
+
+
+```
