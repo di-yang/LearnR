@@ -1,5 +1,5 @@
 ---
-title: "Result without weight, control for racial disparity, droped slope for highschool, PCP, unemployment"
+title: "Result with weight; control for racial disparity; droped slope for highschool, PCP, unemployment; dif as dependent variable"
 output:
   html_document:
     df_print: paged

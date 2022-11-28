@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Result with weight; control for racial disparity; droped slope for highschool, PCP, unemployment; slope as dependent variable"
 output:
   html_document:
     df_print: paged
