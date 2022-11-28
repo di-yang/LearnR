@@ -100,7 +100,6 @@ matrix(runif(100), ncol = 20)
 
 library(caret)
 library(xgboost)
-library(plyr)
 library(doParallel)
 library(pdp)
 set.seed (1)
@@ -161,7 +160,7 @@ xgb.pdp[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(150, 600) )
+res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = training, ylim=c(99, 601) )
 }
 
 res.partialplot[[1]]
@@ -183,7 +182,6 @@ matrix(runif(100), ncol = 20)
 
 library(caret)
 library(xgboost)
-library(plyr)
 library(doParallel)
 library(pdp)
 set.seed (1)
@@ -241,7 +239,7 @@ xgb.pdp2[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot2[[m]] = plotPartial(xgb.pdp2[[m]], rug =TRUE, train = training, ylim=c(0.1,0.55))
+res.partialplot2[[m]] = plotPartial(xgb.pdp2[[m]], rug =TRUE, train = training, ylim=c(0.09,0.61))
 }
 
 res.partialplot2[[1]]
@@ -263,7 +261,6 @@ matrix(runif(100), ncol = 20)
 
 library(caret)
 library(xgboost)
-library(plyr)
 library(doParallel)
 library(pdp)
 set.seed (1)
@@ -322,7 +319,7 @@ xgb.pdp3[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot3[[m]] = plotPartial(xgb.pdp3[[m]], rug =TRUE, train = training, ylim=c(-0.3, 0.4))
+res.partialplot3[[m]] = plotPartial(xgb.pdp3[[m]], rug =TRUE, train = training, ylim=c(-0.35, 0.45))
 }
 
 res.partialplot3[[1]]
@@ -344,7 +341,6 @@ matrix(runif(100), ncol = 20)
 
 library(caret)
 library(xgboost)
-library(plyr)
 library(doParallel)
 library(pdp)
 set.seed (1)
@@ -402,7 +398,7 @@ xgb.pdp4[[m]] =
     chull = TRUE,
     plot.engine = "ggplot2"
   )
-res.partialplot4[[m]] = plotPartial(xgb.pdp4[[m]], rug =TRUE, train = training, ylim=c(-2,3) )
+res.partialplot4[[m]] = plotPartial(xgb.pdp4[[m]], rug =TRUE, train = training, ylim=c(-2.5,3.1) )
 }
 
 res.partialplot4[[1]]
