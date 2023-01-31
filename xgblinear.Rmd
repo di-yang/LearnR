@@ -155,7 +155,7 @@ pred_1 = predict(object = xgbFit1,newdata = training_somecollegea)
 delta_somecollegea = pred_1 - pred_0
 hist(delta_somecollegea)
 summary(delta_somecollegea)
-summarytraining$somecollegea
+summary(training$somecollegea)
 summary(training$somecollegea)
 # too few observations near the threshold
 ```
