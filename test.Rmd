@@ -1,0 +1,83 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(naniar)
+rm(list = ls())
+set.seed (1)
+load("analytic2.RData")
+pct_miss(analytic2)
+
+test.data=analytic2 %>% select(YPLLRate_2018, FairPoor_2018, MentallyUnhealthyDays_2018, PhysicallyUnhealthyDays_2018)
+cor(as.matrix(test.data))
+
+
+analytic2$YPLLdif=analytic2$YPLLRate_2019-analytic2$YPLLRate_2015
+analytic2$FairPoordif=analytic2$FairPoor_2019-analytic2$FairPoor_2015
+analytic2$mentaldif=analytic2$MentallyUnhealthyDays_2019-analytic2$MentallyUnhealthyDays_2015
+analytic2$physicaldif=analytic2$PhysicallyUnhealthyDays_2019-analytic2$PhysicallyUnhealthyDays_2015
+test.data2=analytic2 %>% select(YPLLdif, FairPoordif, mentaldif, physicaldif)
+cor(as.matrix(test.data2))
+
+analytic2$YPLLmean=(analytic2$YPLLRate_2019 + analytic2$YPLLRate_2018 + analytic2$YPLLRate_2017 + analytic2$YPLLRate_2016 + analytic2$YPLLRate_2015)/5
+analytic2$FairPoormean=(analytic2$FairPoor_2019 + analytic2$FairPoor_2018 + analytic2$FairPoor_2017 + analytic2$FairPoor_2016 + analytic2$FairPoor_2015)/5
+analytic2$mentalmean=(analytic2$MentallyUnhealthyDays_2019 + analytic2$MentallyUnhealthyDays_2018 + analytic2$MentallyUnhealthyDays_2017 + analytic2$MentallyUnhealthyDays_2016 + analytic2$MentallyUnhealthyDays_2015)/5
+analytic2$physicalmean=(analytic2$PhysicallyUnhealthyDays_2019 + analytic2$PhysicallyUnhealthyDays_2018 + analytic2$PhysicallyUnhealthyDays_2017 + analytic2$PhysicallyUnhealthyDays_2016 + analytic2$PhysicallyUnhealthyDays_2015)/5
+test.data3=analytic2 %>% select(YPLLmean, FairPoormean, mentalmean, physicalmean)
+cor(as.matrix(test.data3))
+```
+
+```{r}
+library(tidyverse)
+rm(list = ls())
+set.seed (1)
+load("analyticb.RData")
+test.data=analyticb %>% select(YPLLb, fairpoorb, physicalb, mentalb)
+cor(as.matrix(test.data))
+```
+
+
+```{r}
+library(tidyverse)
+set.seed (1)
+load("analytic3FIPS.RData")
+test.data=analyticb %>% select(YPLLb, fairpoorb, physicalb, mentalb)
+cor(as.matrix(test.data))
+```
+
+```{r}
+library(tidyverse)
+library(naniar)
+rm(list = ls())
+set.seed (1)
+load("analytic2.RData")
+pct_miss(analytic2)
+
+test.data=analytic2 %>% select(YPLLRate_2018, FairPoor_2018, MentallyUnhealthyDays_2018, PhysicallyUnhealthyDays_2018)
+cor(as.matrix(test.data))
+
+
+analytic2$YPLLdif=analytic2$YPLLRate_2019-analytic2$YPLLRate_2016
+analytic2$FairPoordif=analytic2$FairPoor_2019-analytic2$FairPoor_2016
+analytic2$mentaldif=analytic2$MentallyUnhealthyDays_2019-analytic2$MentallyUnhealthyDays_2016
+analytic2$physicaldif=analytic2$PhysicallyUnhealthyDays_2019-analytic2$PhysicallyUnhealthyDays_2016
+test.data2=analytic2 %>% select(YPLLdif, FairPoordif, mentaldif, physicaldif)
+cor(as.matrix(test.data2))
+
+analytic2$YPLLmean=(analytic2$YPLLRate_2019 + analytic2$YPLLRate_2018 + analytic2$YPLLRate_2017 + analytic2$YPLLRate_2016 )/4
+analytic2$FairPoormean=(analytic2$FairPoor_2019 + analytic2$FairPoor_2018 + analytic2$FairPoor_2017 + analytic2$FairPoor_2016 )/4
+analytic2$mentalmean=(analytic2$MentallyUnhealthyDays_2019 + analytic2$MentallyUnhealthyDays_2018 + analytic2$MentallyUnhealthyDays_2017 + analytic2$MentallyUnhealthyDays_2016 )/4
+analytic2$physicalmean=(analytic2$PhysicallyUnhealthyDays_2019 + analytic2$PhysicallyUnhealthyDays_2018 + analytic2$PhysicallyUnhealthyDays_2017 + analytic2$PhysicallyUnhealthyDays_2016 )/4
+test.data3=analytic2 %>% select(YPLLmean, FairPoormean, mentalmean, physicalmean)
+cor(as.matrix(test.data3))
+```
+

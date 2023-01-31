@@ -144,6 +144,20 @@ vi$importance
 xgbFit1
 plot(xgbFit1)
 ```
+```{r}
+training_somecollegea = training
+training_somecollegea$somecollegea = training$somecollegea*1.1
+pred_0 = predict(object = xgbFit1,newdata = training)
+hist(pred_0)
+pred_1 = predict(object = xgbFit1,newdata = training_somecollegea)
+delta_somecollegea = pred_1 - pred_0
+hist(delta_somecollegea)
+summary(delta_somecollegea)
+summarytraining$somecollegea
+summary(training$somecollegea)
+# too few observations near the threshold
+```
+
 
 ```{r }
 xgb.pdp = list()
