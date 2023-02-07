@@ -1,0 +1,197 @@
+---
+title: "Determinants Elasticity xgbTree"
+output: html_document
+date: "2023-02-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Preliminaries: load required packages and perform merges
+
+```{r, echo=FALSE}
+rm(list = ls())
+library(tidyverse)
+library(weights)
+library(caret)
+library(xgboost)
+library(doParallel)
+library(pdp)
+options(width = 300)
+```
+
+Perform merges: 
+
+```{r, echo=FALSE}
+disparity=read_csv("./race.csv", col_types = "ccdddd")
+disparity$FIPS=substr(disparity$GEO_ID, 10, 14)
+disparity$blwt=disparity$S1701_C03_010E - disparity$S1701_C03_009E
+disparity$hpnon=disparity$S1701_C03_016E - disparity$S1701_C03_017E
+tomerge=disparity[c(7:9)]
+load("analytic3FIPS.RData")
+analyticwrace=merge(analytic3, tomerge, by.x="FIPS", by.y="FIPS")
+load("weight.RData")
+analyticwrace=merge(analyticwrace, weight, by.x="FIPS", by.y="FIPS")
+analyticwrace = na.omit(analyticwrace)
+analyticwrace = analyticwrace[-1]
+YPLLanalytic=analyticwrace[-c(2,3,4,23)]
+
+save(YPLLanalytic, file="YPLLanalytic.Rdata")
+```
+
+Tune xgbTree:
+
+```{r}
+load(file = "YPLLanalytic.Rdata")
+
+nc = parallel::detectCores()  
+cl = makePSOCKcluster(nc-1)   # Set number of cores equal to machine number minus one
+registerDoParallel(cl)        #Set up parallel
+
+fitControl = trainControl(method = "repeatedcv",
+                          number = 10,
+                          repeats = 10,
+                          allowParallel=TRUE
+)
+
+#Step 1: find range of nrounds associated with different learning rates with non-stochastic trees, default max_depth 6, min_child_weight 20
+
+xgbGrid1 = expand.grid(nrounds = c(1,5,10,20,50,100,150,200,250,300,350,400,450,500), 
+                       max_depth = 6, 
+                       eta = c(.005,.01,.02,.04,.08,.16,.32), 
+                       gamma = 0,
+                       colsample_bytree = 1, 
+                       min_child_weight = 20,
+                       subsample = 1) 
+
+set.seed (112358)
+xgbFit1 = train(YPLLdif ~ ., data = YPLLanalytic,
+                method = "xgbTree", 
+                trControl = fitControl,
+                tuneGrid = xgbGrid1,
+                weights = analyticwrace$averweight,
+                nthread=1,
+                verbosity = 0
+)
+
+plot(xgbFit1)
+xgbFit1$bestTune
+
+#Step 2: We've ruled out fast learning rates. .005 and .01 are approximately the same and require between 150 and 450 rounds. Next, allow for stochastic variation and see if range still works
+
+xgbGrid2 = expand.grid(nrounds = c(150,200,250,300,350,400,450), 
+                       max_depth = 6, 
+                       eta = c(.005,.01), 
+                       gamma = 0,
+                       colsample_bytree = c(.2,.5,.8,1), 
+                       min_child_weight = 20,
+                       subsample = c(.2,.5,.8,1)) 
+
+set.seed (112358)
+xgbFit2 = train(YPLLdif ~ ., data = YPLLanalytic,
+                method = "xgbTree", 
+                trControl = fitControl,
+                tuneGrid = xgbGrid2,
+                weights = analyticwrace$averweight,
+                nthread=1,
+                verbosity = 0
+)
+
+plot(xgbFit2)
+xgbFit2$bestTune
+
+#Step 3: eta = .01 confirmed around 300 trees; approx subsample .2, colsample .5; now vary depth
+
+xgbGrid3 = expand.grid(nrounds = seq(240,360,20), 
+                       max_depth = c(3,4,5,6), 
+                       eta = .01, 
+                       gamma = 0,
+                       colsample_bytree = c(.4,.5,.6,.7), 
+                       min_child_weight = 20,
+                       subsample = c(.05,.1,.2,.3)) 
+
+set.seed (112358)
+xgbFit3 = train(YPLLdif ~ ., data = YPLLanalytic,
+                method = "xgbTree", 
+                trControl = fitControl,
+                tuneGrid = xgbGrid3,
+                weights = analyticwrace$averweight,
+                nthread=1,
+                verbosity = 0
+)
+
+plot(xgbFit3)
+xgbFit3$bestTune
+
+#Step 4: final fine-tuning
+
+xgbGridFinal = expand.grid(nrounds = seq(250,350,2), 
+                       max_depth = 4, 
+                       eta = .01, 
+                       gamma = 0,
+                       colsample_bytree = .5, 
+                       min_child_weight = 20,
+                       subsample = .2) 
+
+set.seed (112358)
+xgbFitFinal = train(YPLLdif ~ ., data = YPLLanalytic,
+                method = "xgbTree", 
+                trControl = fitControl,
+                tuneGrid = xgbGridFinal,
+                weights = analyticwrace$averweight,
+                nthread=1,
+                verbosity = 0
+)
+
+plot(xgbFitFinal)
+xgbFitFinal$bestTune
+
+stopCluster(cl)
+
+save(xgbFitFinal,file="xgbFitFinal.Rdata")
+```
+
+Results:
+
+```{r}
+load(file="YPLLanalytic.Rdata")
+load(file = "xgbFitFinal.Rdata")
+
+plot(varImp(xgbFitFinal))
+vi=varImp(xgbFitFinal)
+vi$importance
+xgbFitFinal
+xgb.pdp = list()
+res.partialplot = list()
+predvarls = rownames(varImp(xgbFitFinal)$importance)
+
+for (m in 1:length(predvarls)){
+  xgb.pdp[[m]] = 
+    partial(
+      object = xgbFitFinal,
+      pred.var = predvarls[[m]],
+      plot = FALSE,
+      chull = TRUE,
+      plot.engine = "ggplot2"
+    )
+  res.partialplot[[m]] = plotPartial(xgb.pdp[[m]], rug =TRUE, train = YPLLanalytic, ylim=c(99, 601) )
+}
+
+for(j in 1:length(predvarls)){
+  print(res.partialplot[[j]])
+}
+
+get_elast = function(var,d,weights,fit,elast_pct){
+  pred_0 = predict(object = fit,newdata = d)
+  d_elast = d
+  d_elast[,var] = d[,var]*(1+elast_pct)
+  pred_1 = predict(object = fit,newdata = d_elast)
+  delta_var = (pred_1 - pred_0)/pred_0
+  elast_var = weighted.mean(x = delta_var,w = weights)/elast_pct
+  return(elast_var)
+}
+ 
+sapply(X = predvarls,FUN = get_elast,d = YPLLanalytic,weights=analyticwrace$averweight,fit = xgbFitFinal,elast_pct = .01)
+```
+
