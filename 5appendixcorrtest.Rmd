@@ -14,7 +14,7 @@ library(tidyverse)
 library(naniar)
 rm(list = ls())
 set.seed (1)
-load("analytic2.RData")
+load("fullanalytic2.RData")
 pct_miss(analytic2)
 
 test.data=analytic2 %>% select(YPLLRate_2018, FairPoor_2018, MentallyUnhealthyDays_2018, PhysicallyUnhealthyDays_2018)

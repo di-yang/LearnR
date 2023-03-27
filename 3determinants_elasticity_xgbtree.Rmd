@@ -21,6 +21,59 @@ library(pdp)
 options(width = 300)
 ```
 
+# create weight manually
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(readxl)
+filenames <- list.files("./Ranked Measure Data2")
+filenames
+RMD <- data.frame(matrix(ncol = 0, nrow = 0))
+for (filename in filenames){  
+   yearnum <- gsub(".xls", "", filename)  
+   RMD = RMD %>% bind_rows(assign(paste0("RMD",yearnum), read_excel(paste0("./Ranked Measure Data2/", filename), sheet="Ranked Measure Data", skip = 1) %>%
+            mutate(year=yearnum) %>% 
+            select(FIPS, year, YPLLRateLow, YPLLRateHigh)))
+}
+
+RMD$year=as.integer(RMD$year)
+RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
+RMD=RMD %>% drop_na(FIPS)
+RMDwide= pivot_wider(RMD, id_cols = FIPS,  names_from = year, values_from = c(YPLLRateLow, YPLLRateHigh))
+
+RMDwide$range15=(RMDwide$YPLLRateHigh_2015 - RMDwide$YPLLRateLow_2015)/(4*1.96)
+RMDwide$irange15=1/RMDwide$range15
+RMDwide$weight15=RMDwide$irange15 / sum(RMDwide$irange15, na.rm = TRUE)
+sum(RMDwide$weight15 , na.rm = TRUE)
+
+RMDwide$range16=(RMDwide$YPLLRateHigh_2016 - RMDwide$YPLLRateLow_2016)/(4*1.96)
+RMDwide$irange16=1/RMDwide$range16
+RMDwide$weight16=RMDwide$irange16 / sum(RMDwide$irange16, na.rm = TRUE)
+sum(RMDwide$weight16, na.rm = TRUE)
+
+RMDwide$range17=(RMDwide$YPLLRateHigh_2017 - RMDwide$YPLLRateLow_2017)/(4*1.96)
+RMDwide$irange17=1/RMDwide$range17
+RMDwide$weight17=RMDwide$irange17 / sum(RMDwide$irange17, na.rm = TRUE)
+sum(RMDwide$weight17, na.rm = TRUE)
+
+RMDwide$range18=(RMDwide$YPLLRateHigh_2018 - RMDwide$YPLLRateLow_2018)/(4*1.96)
+RMDwide$irange18=1/RMDwide$range18
+RMDwide$weight18=RMDwide$irange18 / sum(RMDwide$irange18, na.rm = TRUE)
+sum(RMDwide$weight18, na.rm = TRUE)
+
+RMDwide$range19=(RMDwide$YPLLRateHigh_2019 - RMDwide$YPLLRateLow_2019)/(4*1.96)
+RMDwide$irange19=1/RMDwide$range19
+RMDwide$weight19=RMDwide$irange19 / sum(RMDwide$irange19, na.rm = TRUE)
+sum(RMDwide$weight19, na.rm = TRUE)
+
+weight=RMDwide[c(1, 14, 17, 20, 23, 26)]
+weight[is.na(weight)] = 0
+weight$averweight=dim(weight)[1]*(weight$weight15 + weight$weight16 + weight$weight17 + weight$weight18 + weight$weight19)/5
+weight=weight[c(1, 7)]
+save(weight, file = "weight.RData")
+
+```
+
 Perform merges: 
 
 ```{r, echo=FALSE}

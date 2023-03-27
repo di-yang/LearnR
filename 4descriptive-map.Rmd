@@ -152,3 +152,61 @@ ggsave(paste(measurevar, ".png", sep = ""),
 }
 res.list_map = mapply(call.map, measurelist, mapnamelist)
 ```
+
+```{r}
+library(viridis)
+library(tidyverse)
+library(ggplot2)
+library(maps)
+library(maptools)
+library(rgeos)
+library(albersusa)
+library(ggalt)
+library(ggthemes)
+library(dplyr)
+library(usmap)
+rm(list = ls())
+load("analytic3FIPS.RData")
+analytic3$fips=analytic3$FIPS
+
+#method 1
+plot_usmap(data=analytic3, values="YPLLdif", color = NA) + scale_fill_gradient2(low = "green", mid = "white", high = "red", na.value = "grey", midpoint = 0) +theme(legend.position = "right")
+
+#method 2
+counties = counties_composite()
+counties_map = fortify(counties, region="fips")
+gg = ggplot() 
+gg = gg + geom_map(data=counties_map, map=counties_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="#b3b3b3", size=0.15, fill="grey")
+gg = gg +  geom_map(data=analytic3, map=counties_map,
+                    aes(fill=YPLLdif, map_id=fips),
+                    color="#b3b3b3", size=0.15)
+gg = gg + scale_fill_gradient2(  low = "green", mid = "white", high = "red", na.value = "grey", midpoint = 0)
+gg
+
+```
+# ```{r}
+# library(grid)
+# library(gridExtra)
+# 
+# p1=plot_usmap(data=analytic3, values="YPLLdif", color = NA) + scale_fill_gradient2(low = "green", mid = "white", high = "red", na.value = "grey", midpoint = 0)+theme(legend.position = "right")
+# p2=plot_usmap(data=analytic3, values="mentaldif", color = NA) + scale_fill_gradient2(low = "green", mid = "white", high = "red", na.value = "grey", midpoint = 0)+theme(legend.position = "right")
+# p3=plot_usmap(data=analytic3, values="physicaldif", color = NA) + scale_fill_gradient2(low = "green", mid = "white", high = "red", na.value = "grey", midpoint = 0)+theme(legend.position = "right")
+# p4=plot_usmap(data=analytic3, values="fairpoordif", color = NA) + scale_fill_gradient2(low = "green", mid = "white", high = "red", na.value = "grey", midpoint = 0)+theme(legend.position = "right")
+# grid.arrange(grobs = list(p1, p2, p3, p4) , ncol = 2)
+# ```
+# ```{r}
+# measurelist = list("YPLLdif",
+#             "mentaldif",
+#             "physicaldif",
+#             "fairpoordif"
+#             )
+# call.map = function(measurevar){
+#   mapplot=plot_usmap(data=analytic3, values=measurevar, color = NA) + scale_fill_gradient2(low = "green", mid = "white", high = "red", na.value = "grey", midpoint = 0)+theme(legend.position = "right")
+# }
+# 
+# res.list_map = mapply(call.map, measurelist, SIMPLIFY = FALSE)
+# 
+# grid.arrange(grobs = res.list_map , ncol = 2)
+# ```

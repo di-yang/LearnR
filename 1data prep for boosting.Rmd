@@ -11,7 +11,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 rm(list = ls())
 library(tidyverse)
 library(readxl)
-filenames <- list.files("./Ranked Measure Data2")
+filenames <- list.files("./Ranked Measure Data")
 filenames
 RMD <- data.frame(matrix(ncol = 0, nrow = 0))
 for (filename in filenames){  
@@ -39,8 +39,8 @@ g <- list(
   showlakes = TRUE,
   lakecolor = toRGB('white')
 )
-RMD$year=as.integer(RMD$year)
-RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
+# RMD$year=as.integer(RMD$year)
+# RMD=RMD %>% filter(substring(FIPS, 3,5)!="000")
 ```
 
 
@@ -112,11 +112,11 @@ depvarlist = list("MentallyUnhealthyDays_2020",
 predvarnames=names(analytic)
 predvarnames
 
-library(naniar)
-missplot=gg_miss_var(analytic)
-view(missplot$data)
-pct_miss(analytic)
-n_complete(analytic)
+# library(naniar)
+# missplot=gg_miss_var(analytic)
+# view(missplot$data)
+# pct_miss(analytic)
+# n_complete(analytic)
 
 call.lm = function(depvarname){
   formula.lm = as.formula(paste(depvarname, paste(paste(predvarnames[2:48], collapse=" + "), paste(predvarnames[97:164], collapse=" + "), sep=" + "), sep=" ~ "))
@@ -132,55 +132,55 @@ save(analytic, file = "analytic.RData")
 ```
 
 ```{r}
-analytic2=analytic %>% subset(select=-c(PCPRate_2012, obesity_2013, PM25_2015, PM25_2016, PM25_2018, PM25_2020, inactivity_2013, highschool_2018))
-analytic2 = na.omit(analytic2)
+analytic2=data.frame(analytic[1], analytic[10:14], analytic[22:26], analytic[39:43], analytic[54], analytic[58], analytic[66], analytic[70], analytic[78], analytic[82], analytic[90], analytic[94], analytic[97:101], analytic[109:113], analytic[130:133], analytic[141:145], analytic[153:157])
+#analytic2 = na.omit(analytic2)
+names(analytic2)
+save(analytic2, file = "fullanalytic2.RData")
+
+analytic2=data.frame(analytic[1], analytic[10:14], analytic[22:26], analytic[39:43], analytic[54], analytic[58],analytic[97:101], analytic[109:113], analytic[130:133], analytic[141:145], analytic[153:157])
+#analytic2 = na.omit(analytic2)
 names(analytic2)
 save(analytic2, file = "analytic2.RData")
-
 ```
 
-```{r}
-YPLLanalytic=data.frame(analytic2[2:48], analytic2["YPLLRate_2021"], analytic2[97:156])
-#names(YPLLanalytic)=names(analytic2)[c(2:48, 60, 97:156)]
-# why does the variable name change from "YPLLRate_2021" to "analytic2.YPLLRate_2021"?
-#YPLLanalytic = rename(YPLLanalytic, YPLLRate_2021 = analytic2.YPLLRate_2021)
-names(YPLLanalytic)
-save(YPLLanalytic, file = "YPLLanalytic.RData")
-```
+# ```{r}
+# YPLLanalytic=data.frame(analytic2[2:48], analytic2["YPLLRate_2021"], analytic2[97:156])
+# #names(YPLLanalytic)=names(analytic2)[c(2:48, 60, 97:156)]
+# # why does the variable name change from "YPLLRate_2021" to "analytic2.YPLLRate_2021"?
+# #YPLLanalytic = rename(YPLLanalytic, YPLLRate_2021 = analytic2.YPLLRate_2021)
+# names(YPLLanalytic)
+# save(YPLLanalytic, file = "YPLLanalytic.RData")
+# ```
+# 
+# ```{r}
+# rm(list = ls())
+# load("analytic2.RData")
+# physicalanalytic=data.frame(analytic2[2:48], analytic2$PhysicallyUnhealthyDays_2021, analytic2[97:156])
+# names(physicalanalytic)
+# physicalanalytic = physicalanalytic %>% rename(PhysicallyUnhealthyDays_2021 = analytic2.PhysicallyUnhealthyDays_2021)
+# names(physicalanalytic)
+# save(physicalanalytic, file = "physicalanalytic.RData")
+# ```
+# 
+# ```{r}
+# rm(list = ls())
+# load("analytic2.RData")
+# mentalanalytic=data.frame(analytic2[2:48], analytic2$MentallyUnhealthyDays_2021, analytic2[97:156])
+# names(mentalanalytic)
+# mentalanalytic = mentalanalytic %>% rename(MentallyUnhealthyDays_2021 = analytic2.MentallyUnhealthyDays_2021)
+# names(mentalanalytic)
+# save(mentalanalytic, file = "mentalanalytic.RData")
+# ```
+# 
+# ```{r}
+# rm(list = ls())
+# load("analytic2.RData")
+# fairpooranalytic=data.frame(analytic2[2:48], analytic2$FairPoor_2021, analytic2[97:156])
+# names(fairpooranalytic)
+# fairpooranalytic = fairpooranalytic %>% rename(FairPoor_2021 = analytic2.FairPoor_2021)
+# names(fairpooranalytic)
+# save(fairpooranalytic, file = "fairpooranalytic.RData")
+# ```
 
-```{r}
-rm(list = ls())
-load("analytic2.RData")
-physicalanalytic=data.frame(analytic2[2:48], analytic2$PhysicallyUnhealthyDays_2021, analytic2[97:156])
-names(physicalanalytic)
-physicalanalytic = physicalanalytic %>% rename(PhysicallyUnhealthyDays_2021 = analytic2.PhysicallyUnhealthyDays_2021)
-names(physicalanalytic)
-save(physicalanalytic, file = "physicalanalytic.RData")
-```
 
-```{r}
-rm(list = ls())
-load("analytic2.RData")
-mentalanalytic=data.frame(analytic2[2:48], analytic2$MentallyUnhealthyDays_2021, analytic2[97:156])
-names(mentalanalytic)
-mentalanalytic = mentalanalytic %>% rename(MentallyUnhealthyDays_2021 = analytic2.MentallyUnhealthyDays_2021)
-names(mentalanalytic)
-save(mentalanalytic, file = "mentalanalytic.RData")
-```
-
-```{r}
-rm(list = ls())
-load("analytic2.RData")
-fairpooranalytic=data.frame(analytic2[2:48], analytic2$FairPoor_2021, analytic2[97:156])
-names(fairpooranalytic)
-fairpooranalytic = fairpooranalytic %>% rename(FairPoor_2021 = analytic2.FairPoor_2021)
-names(fairpooranalytic)
-save(fairpooranalytic, file = "fairpooranalytic.RData")
-```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
