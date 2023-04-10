@@ -1,7 +1,7 @@
 ---
 title: "Determinants Elasticity xgbTree"
 output: html_document
-date: "2023-02-06"
+date: "2023-04-10"
 ---
 
 ```{r setup, include=FALSE}
@@ -110,72 +110,72 @@ fitControl = trainControl(method = "repeatedcv",
 
 #Step 1: find range of nrounds associated with different learning rates with non-stochastic trees, default max_depth 6, min_child_weight 20
 
-xgbGrid1 = expand.grid(nrounds = c(1,5,10,20,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1200,1300,1400,1500), 
-                       max_depth = 6, 
-                       eta = c(.0025,.005,.01,.02,.04,.08,.16,.32), 
-                       gamma = 0,
-                       colsample_bytree = 1, 
-                       min_child_weight = 20,
-                       subsample = 1) 
-
-set.seed (112358)
-xgbFit1 = train(YPLLdif ~ ., data = YPLLanalytic,
-                method = "xgbTree", 
-                trControl = fitControl,
-                tuneGrid = xgbGrid1,
-                weights = analyticwrace$averweight,
-                nthread=1,
-                verbosity = 0
-)
-
-plot(xgbFit1)
-xgbFit1$bestTune
-
-#Step 2: We've ruled out fast learning rates. .005 and .01 are approximately the same. Next, allow for stochastic variation and see if range still works
-
-xgbGrid2 = expand.grid(nrounds = seq(100,1000,100), 
-                       max_depth = 6, 
-                       eta = c(.005,.01), 
-                       gamma = 0,
-                       colsample_bytree = c(.2,.5,.8,1), 
-                       min_child_weight = 20,
-                       subsample = c(.2,.5,.8,1)) 
-
-set.seed (112358)
-xgbFit2 = train(YPLLdif ~ ., data = YPLLanalytic,
-                method = "xgbTree", 
-                trControl = fitControl,
-                tuneGrid = xgbGrid2,
-                weights = analyticwrace$averweight,
-                nthread=1,
-                verbosity = 0
-)
-
-plot(xgbFit2)
-xgbFit2$bestTune
-
-#Step 3: eta = .005 confirmed around 600 trees; approx subsample .2, colsample .5; now vary depth
-
-xgbGrid3 = expand.grid(nrounds = seq(400,1200,50), 
-                       max_depth = c(3,4,5,6,7,8,9), 
-                       eta = .005, 
-                       gamma = 0,
-                       colsample_bytree = c(.4,.5,.6,.7), 
-                       min_child_weight = 20,
-                       subsample = c(.1,.2,.3)) 
-
-set.seed (112358)
-xgbFit3 = train(YPLLdif ~ ., data = YPLLanalytic,
-                method = "xgbTree", 
-                trControl = fitControl,
-                tuneGrid = xgbGrid3,
-                weights = analyticwrace$averweight,
-                nthread=1,
-                verbosity = 0
-)
-
-plot(xgbFit3)
-xgbFit3$bestTune
+# xgbGrid1 = expand.grid(nrounds = c(1,5,10,20,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1200,1300,1400,1500), 
+#                        max_depth = 6, 
+#                        eta = c(.0025,.005,.01,.02,.04,.08,.16,.32), 
+#                        gamma = 0,
+#                        colsample_bytree = 1, 
+#                        min_child_weight = 20,
+#                        subsample = 1) 
+# 
+# set.seed (112358)
+# xgbFit1 = train(YPLLdif ~ ., data = YPLLanalytic,
+#                 method = "xgbTree", 
+#                 trControl = fitControl,
+#                 tuneGrid = xgbGrid1,
+#                 weights = analyticwrace$averweight,
+#                 nthread=1,
+#                 verbosity = 0
+# )
+# 
+# plot(xgbFit1)
+# xgbFit1$bestTune
+# 
+# #Step 2: We've ruled out fast learning rates. .005 and .01 are approximately the same. Next, allow for stochastic variation and see if range still works
+# 
+# xgbGrid2 = expand.grid(nrounds = seq(100,1000,100), 
+#                        max_depth = 6, 
+#                        eta = c(.005,.01), 
+#                        gamma = 0,
+#                        colsample_bytree = c(.2,.5,.8,1), 
+#                        min_child_weight = 20,
+#                        subsample = c(.2,.5,.8,1)) 
+# 
+# set.seed (112358)
+# xgbFit2 = train(YPLLdif ~ ., data = YPLLanalytic,
+#                 method = "xgbTree", 
+#                 trControl = fitControl,
+#                 tuneGrid = xgbGrid2,
+#                 weights = analyticwrace$averweight,
+#                 nthread=1,
+#                 verbosity = 0
+# )
+# 
+# plot(xgbFit2)
+# xgbFit2$bestTune
+# 
+# #Step 3: eta = .005 confirmed around 600 trees; approx subsample .2, colsample .5; now vary depth
+# 
+# xgbGrid3 = expand.grid(nrounds = seq(400,1200,50), 
+#                        max_depth = c(3,4,5,6,7,8,9), 
+#                        eta = .005, 
+#                        gamma = 0,
+#                        colsample_bytree = c(.4,.5,.6,.7), 
+#                        min_child_weight = 20,
+#                        subsample = c(.1,.2,.3)) 
+# 
+# set.seed (112358)
+# xgbFit3 = train(YPLLdif ~ ., data = YPLLanalytic,
+#                 method = "xgbTree", 
+#                 trControl = fitControl,
+#                 tuneGrid = xgbGrid3,
+#                 weights = analyticwrace$averweight,
+#                 nthread=1,
+#                 verbosity = 0
+# )
+# 
+# plot(xgbFit3)
+# xgbFit3$bestTune
 
 #Step 4: final fine-tuning / subsample .2, colsample .5, depth 7, around 600 trees
 
