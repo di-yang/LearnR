@@ -239,6 +239,7 @@ library(sfsmisc)
 library(usmap)
 
 res_e = numeric(length = length(predvarls))
+res_semi_e = numeric(length = length(predvarls))
 county_e = matrix(data = NA,nrow = dim(YPLLanalytic)[1],ncol = length(predvarls))
 res.elastplot = list()
 res.semi_elastplot = list()
@@ -263,7 +264,11 @@ for (j in 1:length(predvarls)) {
   # if (predvarls[j] %in% goodlist) {
   #   semi_e_j = -county_e[, j] * abs(YPLLanalytic$YPLLdif)
   # } else semi_e_j = county_e[, j] * abs(YPLLanalytic$YPLLdif)
-  semi_e_j = county_e[, j] * abs(YPLLanalytic$YPLLdif)
+  
+  #semi_e_j = county_e[, j] * abs(YPLLanalytic$YPLLdif)
+  res_semi_e[j]=weighted.mean(x = county_e[, j] * abs(YPLLanalytic$YPLLdif), w =
+                             analyticwrace$averweight)
+  
   semi_etest = data.frame(fips = analyticwrace$FIPS, semi_elast = semi_e_j)
   res.elastplot[[j]] = plot_usmap(regions = "counties",
                                   data = etest,
@@ -288,6 +293,6 @@ for (j in 1:length(predvarls)) {
 }
 
 print(cbind(predvarls,res_e)) #Overall elasticity results
-
+print(cbind(predvarls,res_semi_e)) #semi elasticity results
 ```
 
