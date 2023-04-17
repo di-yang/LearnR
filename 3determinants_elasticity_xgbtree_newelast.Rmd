@@ -1,6 +1,8 @@
 ---
 title: "Determinants Elasticity xgbTree"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 date: "2023-04-10"
 ---
 
