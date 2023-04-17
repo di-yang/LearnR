@@ -1,0 +1,42 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r, echo=FALSE}
+rm(list = ls())
+library(tidyverse)
+library(gtsummary)
+library(usmap)
+options(width = 300)
+```
+
+```{r}
+load(file = "analyticwrace.Rdata")
+analyticwrace$missing=0
+tomerge=analyticwrace %>% select(FIPS,missing)
+load(file = "analytic2.Rdata")
+analyticmis=merge(analytic2, tomerge, by.x="FIPS", by.y="FIPS", all.x=TRUE)
+analyticmis$missing[is.na(analyticmis$missing)==1]=1
+popden=read_xlsx("population_density.xlsx")
+analyticmis=merge(analyticmis, popden, by.x="FIPS", by.y="FIPS")
+analyticmisFIPS=analyticmis
+analyticmisFIPS$fips=analyticmisFIPS$FIPS
+analyticmis=analyticmis %>% select(-FIPS)
+table2=analyticmis %>% tbl_summary(by=missing, missing="no", statistic = all_continuous() ~ "{mean}") %>% 
+  add_p(everything() ~ "t.test", pvalue_fun = function(x) style_pvalue(x, digits = 2)) %>% 
+  as_tibble()
+writexl::write_xlsx(table2, "table2.xlsx")
+
+plot_usmap(regions = "counties", data = analyticmisFIPS, values = "miss_f") + scale_fill_steps(
+  low = "black",
+  high = "white"
+) #+ theme(panel.background = element_rect(color = "black", fill = "white"))
+
+plot_usmap(regions = "county", data=analyticmisFIPS, values = "miss_f",color="grey")+ 
+  theme(panel.background = element_rect(colour = "black")) +
+  scale_fill_manual(values = c(`0` = "white", `1` = "black"), name = "missing") + 
+  theme(legend.position = "right")
+
+```
+
