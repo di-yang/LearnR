@@ -265,7 +265,7 @@ for (j in 1:length(predvarls)) {
   #   semi_e_j = -county_e[, j] * abs(YPLLanalytic$YPLLdif)
   # } else semi_e_j = county_e[, j] * abs(YPLLanalytic$YPLLdif)
   
-  #semi_e_j = county_e[, j] * abs(YPLLanalytic$YPLLdif)
+  semi_e_j = county_e[, j] * abs(YPLLanalytic$YPLLdif)
   res_semi_e[j]=weighted.mean(x = county_e[, j] * abs(YPLLanalytic$YPLLdif), w =
                              analyticwrace$averweight)
   
